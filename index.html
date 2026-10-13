@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeighborShare - Community Equipment & Fix-It Board</title>
+  <title>Township Community Board</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Font: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+
   <script>
     tailwind.config = {
       theme: {
@@ -21,16 +24,11 @@
             brand: {
               50: '#ecfdf5',
               100: '#d1fae5',
-              500: '#10b981',
+              200: '#a7f3d0',
               600: '#059669',
               700: '#047857',
               800: '#065f46',
-            },
-            civic: {
-              50: '#eff6ff',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
+              900: '#064e3b'
             }
           }
         }
@@ -39,956 +37,590 @@
   </script>
 
   <style>
-    /* Custom Scrollbar & Animations */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-
-    .badge-pulse {
-      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-    @keyframes pulse-ring {
-      0%, 100% { opacity: 1; }
-      50% { opacity: .5; }
-    }
-    .modal-backdrop {
+    .backdrop-blur-sm {
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    input, select, textarea {
+      font-size: 14px !important;
+    }
+    /* Smooth transitions */
+    .tab-active {
+      background-color: #ffffff;
+      color: #047857;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
     }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
 
+  <!-- TOP NAVIGATION HEADER -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-18 py-3">
-        <!-- Logo & Community Name -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- App Title & Subtitle -->
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-teal-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
-            <i class="fa-solid fa-hands-holding-circle text-xl"></i>
+          <div class="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white text-xl shadow-xs">
+            🏘️
           </div>
           <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-lg text-slate-900 tracking-tight">NeighborShare</span>
-              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Oakridge District</span>
+            <div class="flex items-center gap-2">
+              <h1 class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">Township Community Board</h1>
+              <span class="hidden sm:inline-flex text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Malaysia
+              </span>
             </div>
-            <p class="text-xs text-slate-500 hidden sm:block">Community Equipment Rental & Civic Issue Board</p>
+            <p class="text-xs text-slate-500">Equipment sharing and neighborhood issue reports</p>
           </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <nav class="flex items-center space-x-1 sm:space-x-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold">
-          <button id="tab-overview" onclick="switchTab('overview')" class="tab-btn px-3.5 py-2 rounded-lg transition-all text-slate-600 hover:text-slate-900">
-            <i class="fa-solid fa-chart-pie mr-1.5"></i><span class="hidden md:inline">Dashboard</span> Overview
+        <!-- Segmented Controls: 2 Tabs -->
+        <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold">
+          <button id="tabBtnTools" onclick="switchTab('tools')" 
+            class="tab-active px-3.5 sm:px-4 py-1.5 rounded-lg transition-all flex items-center gap-2">
+            <span>🛠️ Equipment Rental</span>
+            <span id="toolsBadgeCount" class="text-[11px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold">4</span>
           </button>
-          <button id="tab-equipment" onclick="switchTab('equipment')" class="tab-btn px-3.5 py-2 rounded-lg transition-all text-slate-600 hover:text-slate-900">
-            <i class="fa-solid fa-toolbox mr-1.5 text-brand-600"></i>Equipment Share
-          </button>
-          <button id="tab-issues" onclick="switchTab('issues')" class="tab-btn px-3.5 py-2 rounded-lg transition-all text-slate-600 hover:text-slate-900">
-            <i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-500"></i>Reported Issues
+          <button id="tabBtnIssues" onclick="switchTab('issues')" 
+            class="px-3.5 sm:px-4 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-2">
+            <span>📢 Community Issues</span>
+            <span id="issuesBadgeCount" class="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 font-bold">4</span>
           </button>
         </nav>
 
-        <!-- Quick Action Button -->
-        <div class="hidden sm:flex items-center space-x-2">
-          <button onclick="openModal('listEquipmentModal')" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold bg-brand-50 text-brand-700 hover:bg-brand-100 transition border border-brand-200">
-            <i class="fa-solid fa-plus mr-1.5"></i>List Tool
-          </button>
-          <button onclick="openModal('reportIssueModal')" class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 transition border border-rose-200">
-            <i class="fa-solid fa-bullhorn mr-1.5"></i>Report Issue
-          </button>
-        </div>
       </div>
     </div>
   </header>
 
-  <section class="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white py-6 border-b border-slate-700 shadow-inner">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center sm:text-left">
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- ============================================================== -->
+    <!-- SECTION 1: EQUIPMENT RENTAL                                    -->
+    <!-- ============================================================== -->
+    <section id="sectionTools" class="space-y-5">
+      
+      <!-- Top Action & Search Bar -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         
-        <div class="p-3.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xs flex items-center space-x-3.5">
-          <div class="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-lg shrink-0">
-            <i class="fa-solid fa-screwdriver-wrench"></i>
-          </div>
-          <div>
-            <div class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Available Tools</div>
-            <div class="text-2xl font-extrabold text-white" id="stat-active-equipment">0</div>
-          </div>
+        <!-- Search input -->
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="toolSearchInput" oninput="renderEquipment()" 
+            placeholder="Search equipment by name, street (e.g., Jalan Harmoni 3/2) or owner..."
+            class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition">
         </div>
 
-        <div class="p-3.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xs flex items-center space-x-3.5">
-          <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-lg shrink-0">
-            <i class="fa-solid fa-calendar-check"></i>
-          </div>
-          <div>
-            <div class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Active Bookings</div>
-            <div class="text-2xl font-extrabold text-white" id="stat-active-rentals">0</div>
-          </div>
-        </div>
-
-        <div class="p-3.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xs flex items-center space-x-3.5">
-          <div class="w-11 h-11 rounded-xl bg-rose-500/20 text-rose-300 flex items-center justify-center text-lg shrink-0">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-          </div>
-          <div>
-            <div class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Open Civic Issues</div>
-            <div class="text-2xl font-extrabold text-white" id="stat-open-issues">0</div>
-          </div>
-        </div>
-
-        <div class="p-3.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xs flex items-center space-x-3.5">
-          <div class="w-11 h-11 rounded-xl bg-sky-500/20 text-sky-300 flex items-center justify-center text-lg shrink-0">
-            <i class="fa-solid fa-circle-check"></i>
-          </div>
-          <div>
-            <div class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Resolved This Month</div>
-            <div class="text-2xl font-extrabold text-white" id="stat-resolved-issues">18</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-
-    <!-- VIEW 1: OVERVIEW DASHBOARD -->
-    <div id="view-overview" class="view-panel space-y-8">
-      
-      <!-- Welcome Callout -->
-      <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
-        <div class="absolute -right-8 -bottom-8 opacity-10 text-9xl">
-          <i class="fa-solid fa-people-roof"></i>
-        </div>
-        <div class="relative z-10 max-w-2xl">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white mb-3 backdrop-blur-xs">
-            <i class="fa-solid fa-leaf mr-1.5"></i> Sustainable Sharing & Neighborhood Care
-          </span>
-          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">Welcome to your neighborhood co-op!</h1>
-          <p class="text-emerald-100 text-sm sm:text-base leading-relaxed mb-6">
-            Borrow heavy-duty tools instead of buying, share what you own, and collaborate on fixing street lamps, potholes, and community areas together.
-          </p>
-          <div class="flex flex-wrap gap-3">
-            <button onclick="switchTab('equipment')" class="px-5 py-2.5 rounded-xl font-bold bg-white text-emerald-800 hover:bg-emerald-50 transition shadow-sm text-sm">
-              <i class="fa-solid fa-magnifying-glass mr-2"></i>Borrow Equipment
-            </button>
-            <button onclick="switchTab('issues')" class="px-5 py-2.5 rounded-xl font-bold bg-emerald-800/80 hover:bg-emerald-800 text-white border border-emerald-400/30 transition text-sm">
-              <i class="fa-solid fa-flag mr-2"></i>View Fix-It List
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Highlights Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Equipment Spotlight -->
-        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-brand-700 flex items-center justify-center">
-                  <i class="fa-solid fa-sparkles"></i>
-                </div>
-                <h2 class="text-lg font-bold text-slate-900">Featured Available Tools</h2>
-              </div>
-              <button onclick="switchTab('equipment')" class="text-xs font-bold text-brand-600 hover:text-brand-800 flex items-center">
-                See all <i class="fa-solid fa-arrow-right ml-1"></i>
-              </button>
-            </div>
-            <div id="overview-featured-tools" class="space-y-3">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-          <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs text-slate-500">Got tools lying around in your garage?</span>
-            <button onclick="openModal('listEquipmentModal')" class="text-xs font-bold text-brand-700 hover:underline">
-              + Share with neighbors
-            </button>
-          </div>
-        </div>
-
-        <!-- Urgent Civic Issues -->
-        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
-                  <i class="fa-solid fa-fire text-sm"></i>
-                </div>
-                <h2 class="text-lg font-bold text-slate-900">High Priority Fix-Its</h2>
-              </div>
-              <button onclick="switchTab('issues')" class="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center">
-                Explore feed <i class="fa-solid fa-arrow-right ml-1"></i>
-              </button>
-            </div>
-            <div id="overview-priority-issues" class="space-y-3">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-          <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-xs text-slate-500">Spotted something broken or hazardous?</span>
-            <button onclick="openModal('reportIssueModal')" class="text-xs font-bold text-rose-600 hover:underline">
-              + Submit quick report
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Neighborhood Guidelines -->
-      <div class="bg-slate-100 rounded-2xl p-5 border border-slate-200/80 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-600">
-        <div class="flex items-start space-x-3">
-          <i class="fa-solid fa-shield-halved text-brand-600 text-base mt-0.5"></i>
-          <div>
-            <span class="font-bold text-slate-800 block">Trust & Verification</span>
-            All borrowers verify phone & address section before loan confirmation.
-          </div>
-        </div>
-        <div class="flex items-start space-x-3">
-          <i class="fa-solid fa-soap text-brand-600 text-base mt-0.5"></i>
-          <div>
-            <span class="font-bold text-slate-800 block">Clean Return Guarantee</span>
-            Return tools rinsed, cleared of yard debris, and dry for the next neighbor.
-          </div>
-        </div>
-        <div class="flex items-start space-x-3">
-          <i class="fa-solid fa-users-gear text-brand-600 text-base mt-0.5"></i>
-          <div>
-            <span class="font-bold text-slate-800 block">City Coordination</span>
-            Issues upvoted with 5+ votes are auto-forwarded to municipal public works.
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- VIEW 2: EQUIPMENT SHARING HUB -->
-    <div id="view-equipment" class="view-panel hidden space-y-6">
-      
-      <!-- Filter and Header Bar -->
-      <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
-        <!-- Search & Category -->
-        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1">
-          <div class="relative flex-1">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="text" id="equipmentSearch" oninput="renderEquipment()" placeholder="Search equipment (e.g. mower, drill, washer)..." 
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition">
-          </div>
-          <select id="equipmentCategoryFilter" onchange="renderEquipment()" 
-            class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium bg-slate-50 text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
+        <!-- Category & Add Button -->
+        <div class="flex items-center gap-2">
+          <select id="toolCategoryFilter" onchange="renderEquipment()" 
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-600">
             <option value="All">All Categories</option>
-            <option value="Lawn & Garden">Lawn & Garden</option>
-            <option value="Power Tools">Power Tools</option>
-            <option value="Cleaning & Washers">Cleaning & Washers</option>
-            <option value="Ladders & Access">Ladders & Access</option>
-            <option value="Automotive & Misc">Automotive & Misc</option>
+            <option value="Gardening & Lawn">🌿 Gardening & Lawn</option>
+            <option value="Cleaning">💧 Cleaning</option>
+            <option value="Power Tools">⚡ Power Tools</option>
+            <option value="Event & Canopy">🎪 Event & Canopy</option>
           </select>
-          <select id="equipmentStatusFilter" onchange="renderEquipment()"
-            class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium bg-slate-50 text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
-            <option value="All">All Statuses</option>
-            <option value="Available">Available Now</option>
-            <option value="Reserved">Reserved</option>
-            <option value="In Use">In Use</option>
-          </select>
-        </div>
 
-        <!-- Action Button -->
-        <button onclick="openModal('listEquipmentModal')" class="w-full md:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-sm transition">
-          <i class="fa-solid fa-plus mr-2"></i> List Your Tool
-        </button>
+          <button onclick="openModal('modalAddTool')" 
+            class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-xs transition active:scale-95">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span>+ Add Equipment</span>
+          </button>
+        </div>
       </div>
 
       <!-- Equipment Cards Grid -->
-      <div id="equipmentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Rendered via JavaScript -->
+      <div id="equipmentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered dynamically -->
       </div>
 
       <!-- Empty State -->
-      <div id="equipmentEmptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300">
-        <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center text-2xl mb-3">
-          <i class="fa-solid fa-box-open"></i>
-        </div>
-        <h3 class="font-bold text-slate-800 text-lg">No equipment found</h3>
-        <p class="text-sm text-slate-500 max-w-sm mx-auto mt-1 mb-4">Try adjusting your search filters or be the first to lend this tool to the neighborhood!</p>
-        <button onclick="resetEquipmentFilters()" class="text-xs font-semibold text-brand-600 hover:underline">
-          Reset All Filters
-        </button>
+      <div id="equipmentEmpty" class="hidden text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+        <div class="w-12 h-12 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-2">🛠️</div>
+        <h3 class="text-sm font-bold text-slate-800">No equipment found</h3>
+        <p class="text-xs text-slate-500 mt-1">Try adjusting your search query or list a new item for your neighbors.</p>
       </div>
-    </div>
+    </section>
 
-    <!-- VIEW 3: REPORTED CIVIC ISSUES -->
-    <div id="view-issues" class="view-panel hidden space-y-6">
+
+    <!-- ============================================================== -->
+    <!-- SECTION 2: COMMUNITY ISSUES REPORTING                          -->
+    <!-- ============================================================== -->
+    <section id="sectionIssues" class="hidden space-y-5">
       
-      <!-- Issue Controls & Summary Header -->
-      <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-1">
-          <div class="relative flex-1">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="text" id="issueSearch" oninput="renderIssues()" placeholder="Search issues (e.g. light, pothole, elm st)..." 
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition">
-          </div>
-          <select id="issueStatusFilter" onchange="renderIssues()"
-            class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium bg-slate-50 text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500">
-            <option value="All">All Statuses</option>
-            <option value="Open">Open</option>
+      <!-- Top Action & Filter Bar -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        
+        <!-- Search input -->
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="issueSearchInput" oninput="renderIssues()" 
+            placeholder="Search issues by keyword, street name (e.g. Persiaran Seri Impian 1)..."
+            class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-600 transition">
+        </div>
+
+        <!-- Filters & Report Button -->
+        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <select id="issueCategoryFilter" onchange="renderIssues()" 
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-600">
+            <option value="All">All Categories</option>
+            <option value="Pothole & Roads">🕳️ Pothole & Roads</option>
+            <option value="Streetlights">💡 Streetlights</option>
+            <option value="Clogged Drain (Longkang)">🌊 Clogged Drain (Longkang)</option>
+            <option value="Damaged Playground">🛝 Damaged Playground</option>
+            <option value="Fallen Tree & Landscaping">🌳 Fallen Tree & Branches</option>
+          </select>
+
+          <select id="issueStatusFilter" onchange="renderIssues()" 
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-600">
+            <option value="All">All Status</option>
+            <option value="Reported">Reported</option>
             <option value="In Progress">In Progress</option>
             <option value="Resolved">Resolved</option>
           </select>
-          <select id="issueSeverityFilter" onchange="renderIssues()"
-            class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium bg-slate-50 text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500">
-            <option value="All">All Severities</option>
-            <option value="Urgent">Urgent / High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-        </div>
 
-        <button onclick="openModal('reportIssueModal')" class="w-full md:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm shadow-sm transition">
-          <i class="fa-solid fa-triangle-exclamation mr-2"></i> Report New Issue
-        </button>
+          <button onclick="openModal('modalAddIssue')" 
+            class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-xs transition active:scale-95">
+            <i class="fa-solid fa-bullhorn text-xs"></i>
+            <span>+ Report Issue</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Issues List View -->
-      <div id="issuesList" class="space-y-4">
-        <!-- Rendered via JavaScript -->
+      <!-- Issues List -->
+      <div id="issuesList" class="space-y-3">
+        <!-- Rendered dynamically -->
       </div>
 
       <!-- Empty State -->
-      <div id="issuesEmptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300">
-        <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center text-2xl mb-3">
-          <i class="fa-solid fa-face-smile"></i>
-        </div>
-        <h3 class="font-bold text-slate-800 text-lg">No issues found</h3>
-        <p class="text-sm text-slate-500 max-w-sm mx-auto mt-1 mb-4">Everything looks tidy right now under this filter, or no reports match your search query.</p>
-        <button onclick="resetIssueFilters()" class="text-xs font-semibold text-rose-600 hover:underline">
-          Reset Issue Filters
-        </button>
+      <div id="issuesEmpty" class="hidden text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+        <div class="w-12 h-12 mx-auto rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-2">🎉</div>
+        <h3 class="text-sm font-bold text-slate-800">No issues reported</h3>
+        <p class="text-xs text-slate-500 mt-1">There are no reports matching your filters.</p>
       </div>
-    </div>
+    </section>
 
   </main>
 
-  <!-- MODAL: BOOK / RESERVE EQUIPMENT -->
-  <div id="reserveEquipmentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 modal-backdrop transition-opacity">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
-      
-      <div class="px-6 py-4 bg-gradient-to-r from-brand-600 to-teal-700 text-white flex items-center justify-between">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
-            <i class="fa-solid fa-calendar-plus"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-base leading-tight" id="modalReserveToolName">Reserve Equipment</h3>
-            <p class="text-xs text-brand-100" id="modalReserveOwnerInfo">Owned by Neighbor</p>
-          </div>
+  <!-- ============================================================== -->
+  <!-- MODAL 1: ADD EQUIPMENT                                         -->
+  <!-- ============================================================== -->
+  <div id="modalAddTool" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+      <div class="px-5 py-4 bg-emerald-800 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm">Add Equipment to Share / Rent</h3>
+          <p class="text-emerald-100 text-[11px]">List your tools for neighbors in the township</p>
         </div>
-        <button onclick="closeModal('reserveEquipmentModal')" class="text-white/80 hover:text-white p-1 rounded-lg">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <button onclick="closeModal('modalAddTool')" class="text-white/80 hover:text-white text-base">✕</button>
       </div>
 
-      <form id="reserveForm" onsubmit="handleReserveSubmit(event)" class="p-6 overflow-y-auto space-y-4">
-        <input type="hidden" id="reserveItemId">
-
-        <!-- Tool Highlights Card -->
-        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs">
-          <div>
-            <span class="text-slate-400 block font-medium">Fee / Deposit</span>
-            <span class="font-bold text-slate-800 text-sm" id="modalReservePricing">$0</span>
-          </div>
-          <div class="text-right">
-            <span class="text-slate-400 block font-medium">Pickup Zone</span>
-            <span class="font-bold text-slate-800" id="modalReserveLocation">Oakridge North</span>
-          </div>
-        </div>
-
+      <form id="formAddTool" onsubmit="handleNewTool(event)" class="p-5 space-y-3.5 overflow-y-auto text-xs">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Your Full Name *</label>
-          <input type="text" id="reserveBorrowerName" required placeholder="e.g. Alex Morgan"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
+          <label class="block font-bold text-slate-700 mb-1">Equipment Name *</label>
+          <input type="text" id="newToolName" required placeholder="e.g. Honda 4-Stroke Lawn Mower / Karcher K4 Pressure Washer"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Street Address / Unit *</label>
-            <input type="text" id="reserveBorrowerAddress" required placeholder="e.g. 742 Evergreen Terr"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number *</label>
-            <input type="tel" id="reserveBorrowerPhone" required placeholder="e.g. (555) 392-1829"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Pickup Date *</label>
-            <input type="date" id="reserveStartDate" required
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Return Date *</label>
-            <input type="date" id="reserveEndDate" required
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Intended Usage & Note</label>
-          <textarea id="reserveNotes" rows="2" placeholder="e.g. Pressure wash front driveway and garden stone pathway on Saturday afternoon."
-            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden"></textarea>
-        </div>
-
-        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 flex items-start space-x-2 text-xs text-emerald-800">
-          <i class="fa-solid fa-circle-info text-brand-600 mt-0.5"></i>
-          <span>The tool owner will receive a notification and confirm pickup details via text/call. No payment is charged online.</span>
-        </div>
-
-        <div class="pt-2 flex items-center justify-end space-x-3">
-          <button type="button" onclick="closeModal('reserveEquipmentModal')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
-            Cancel
-          </button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-md shadow-brand-500/20 transition">
-            Confirm Loan Request
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: LIST YOUR OWN EQUIPMENT -->
-  <div id="listEquipmentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 modal-backdrop transition-opacity">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
-      
-      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white">
-            <i class="fa-solid fa-toolbox"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-base leading-tight">Share Equipment with Neighbors</h3>
-            <p class="text-xs text-slate-400">Put idle garden or power tools to good community use</p>
-          </div>
-        </div>
-        <button onclick="closeModal('listEquipmentModal')" class="text-white/80 hover:text-white p-1 rounded-lg">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <form id="listToolForm" onsubmit="handleListToolSubmit(event)" class="p-6 overflow-y-auto space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Equipment Name *</label>
-          <input type="text" id="toolName" required placeholder="e.g. DeWalt 20V Max Cordless Drill Kit"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Category *</label>
-            <select id="toolCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden bg-white">
-              <option value="Lawn & Garden">Lawn & Garden</option>
+            <label class="block font-bold text-slate-700 mb-1">Category *</label>
+            <select id="newToolCategory" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none bg-white">
+              <option value="Gardening & Lawn">Gardening & Lawn</option>
+              <option value="Cleaning">Cleaning</option>
               <option value="Power Tools">Power Tools</option>
-              <option value="Cleaning & Washers">Cleaning & Washers</option>
-              <option value="Ladders & Access">Ladders & Access</option>
-              <option value="Automotive & Misc">Automotive & Misc</option>
+              <option value="Event & Canopy">Event & Canopy</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Condition</label>
-            <select id="toolCondition" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden bg-white">
-              <option value="Like New">Like New</option>
-              <option value="Good Condition" selected>Good Condition</option>
-              <option value="Well Used / Reliable">Well Used / Reliable</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Daily Rate / Deposit *</label>
-            <input type="text" id="toolPricing" required placeholder="e.g. Free ($20 deposit) or $5/day"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Your Name / Sector *</label>
-            <input type="text" id="toolOwner" required placeholder="e.g. David (West Green St)"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden">
+            <label class="block font-bold text-slate-700 mb-1">Rate (RM / day) *</label>
+            <input type="text" id="newToolPrice" required placeholder="e.g. RM 15 / day or Free"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Photo Preset / Icon Style</label>
-          <select id="toolIconPreset" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden bg-white">
-            <option value="fa-screwdriver-wrench">Hand / Power Tool Icon</option>
-            <option value="fa-seedling">Garden / Lawn Tool Icon</option>
-            <option value="fa-shower">Pressure Washer / Water Icon</option>
-            <option value="fa-bars-staggered">Ladder / Step Icon</option>
-            <option value="fa-car">Automotive Icon</option>
-          </select>
+          <label class="block font-bold text-slate-700 mb-1">Malaysian Street Address *</label>
+          <input type="text" id="newToolStreet" required placeholder="e.g. No. 18, Jalan Harmoni 3/2, Precinct 4"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Owner Name *</label>
+            <input type="text" id="newToolOwner" required placeholder="e.g. Uncle Tan / En. Faizal"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Malaysian Mobile / WhatsApp *</label>
+            <input type="tel" id="newToolPhone" required placeholder="+60 12-345 6789"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tool Description & Accessories</label>
-          <textarea id="toolDescription" rows="2.5" placeholder="Mention battery charger included, fuel type if gas, protective goggles, etc."
-            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-hidden"></textarea>
+          <label class="block font-bold text-slate-700 mb-1">Condition & Pickup Notes (Optional)</label>
+          <textarea id="newToolDesc" rows="2" placeholder="e.g. Includes safety goggles & extension wire. Please return clean."
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none"></textarea>
         </div>
 
-        <div class="pt-2 flex items-center justify-end space-x-3">
-          <button type="button" onclick="closeModal('listEquipmentModal')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
-            Cancel
-          </button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-md shadow-brand-500/20 transition">
-            Publish Equipment
-          </button>
+        <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modalAddTool')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold">List Equipment</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: REPORT A CIVIC ISSUE -->
-  <div id="reportIssueModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 modal-backdrop transition-opacity">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
-      
-      <div class="px-6 py-4 bg-rose-600 text-white flex items-center justify-between">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">
-            <i class="fa-solid fa-flag"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-base leading-tight">Report Neighborhood Issue</h3>
-            <p class="text-xs text-rose-100">Bring local potholes, hazards, and outages to light</p>
-          </div>
+  <!-- ============================================================== -->
+  <!-- MODAL 2: REPORT COMMUNITY ISSUE                                -->
+  <!-- ============================================================== -->
+  <div id="modalAddIssue" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+      <div class="px-5 py-4 bg-rose-600 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm">Report Community Issue</h3>
+          <p class="text-rose-100 text-[11px]">Help maintain safety & hygiene in our township</p>
         </div>
-        <button onclick="closeModal('reportIssueModal')" class="text-white/80 hover:text-white p-1 rounded-lg">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <button onclick="closeModal('modalAddIssue')" class="text-white/80 hover:text-white text-base">✕</button>
       </div>
 
-      <form id="reportIssueForm" onsubmit="handleReportIssueSubmit(event)" class="p-6 overflow-y-auto space-y-4">
+      <form id="formAddIssue" onsubmit="handleNewIssue(event)" class="p-5 space-y-3.5 overflow-y-auto text-xs">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Issue Headline *</label>
-          <input type="text" id="issueTitle" required placeholder="e.g. Deep pothole near 5th St crosswalk"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-hidden">
+          <label class="block font-bold text-slate-700 mb-1">Issue Title *</label>
+          <input type="text" id="newIssueTitle" required placeholder="e.g. Hazardous Pothole / Streetlight #08 Faulty"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none">
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Category *</label>
-            <select id="issueCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-hidden bg-white">
-              <option value="Roads & Potholes">Roads & Potholes</option>
-              <option value="Street Lighting">Street Lighting</option>
-              <option value="Parks & Playgrounds">Parks & Playgrounds</option>
-              <option value="Fallen Trees / Debris">Fallen Trees / Debris</option>
-              <option value="Water Leak / Drainage">Water Leak / Drainage</option>
-              <option value="Graffiti / Sanitation">Graffiti / Sanitation</option>
-              <option value="Other">Other</option>
+            <label class="block font-bold text-slate-700 mb-1">Category *</label>
+            <select id="newIssueCategory" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none bg-white">
+              <option value="Pothole & Roads">🕳️ Pothole & Roads</option>
+              <option value="Streetlights">💡 Streetlights</option>
+              <option value="Clogged Drain (Longkang)">🌊 Clogged Drain (Longkang)</option>
+              <option value="Damaged Playground">🛝 Damaged Playground</option>
+              <option value="Fallen Tree & Landscaping">🌳 Fallen Tree & Branches</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Severity / Urgency *</label>
-            <select id="issueSeverity" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-hidden bg-white">
-              <option value="Low">Low (Cosmetic / Low Risk)</option>
-              <option value="Medium" selected>Medium (Standard Maintenance)</option>
-              <option value="Urgent">Urgent / Safety Hazard</option>
+            <label class="block font-bold text-slate-700 mb-1">Priority Level</label>
+            <select id="newIssuePriority" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none bg-white">
+              <option value="Normal">Normal</option>
+              <option value="Urgent">⚠️ Urgent Hazard</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Exact Location / Address *</label>
-          <div class="relative">
-            <i class="fa-solid fa-location-dot absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-            <input type="text" id="issueLocation" required placeholder="e.g. Corner of Elm Ave & Maple Way, opposite unit #42"
-              class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-hidden">
-          </div>
+          <label class="block font-bold text-slate-700 mb-1">Street Address & Landmark *</label>
+          <input type="text" id="newIssueLocation" required placeholder="e.g. Opposite house No. 42, Jalan Kasuarina 8/KS07"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Detailed Description *</label>
-          <textarea id="issueDescription" rows="3" required placeholder="Describe hazard details, how long it has been there, and risk to cyclists/pedestrians..."
-            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-hidden"></textarea>
+          <label class="block font-bold text-slate-700 mb-1">Description of Problem *</label>
+          <textarea id="newIssueDesc" rows="3" required placeholder="e.g. The pothole is roughly 2 feet wide and fills with water after rain. Potential tyre puncture danger for cars and motorbikes."
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none"></textarea>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Reporter Name / Initials</label>
-          <input type="text" id="issueReporter" placeholder="e.g. Sarah J. (Oakridge Resident)"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-hidden">
-        </div>
-
-        <div class="pt-2 flex items-center justify-end space-x-3">
-          <button type="button" onclick="closeModal('reportIssueModal')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
-            Cancel
-          </button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-500/20 transition">
-            Submit Issue to Board
-          </button>
+        <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modalAddIssue')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold">Submit Issue</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: ISSUE UPDATES & COMMENTS -->
-  <div id="issueDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 modal-backdrop transition-opacity">
-    <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
-      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+  <!-- ============================================================== -->
+  <!-- MODAL 3: QUICK RESERVE EQUIPMENT                               -->
+  <!-- ============================================================== -->
+  <div id="modalReserve" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden border border-slate-100 p-5 space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
         <div>
-          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 mb-1 inline-block" id="modalIssueCategory">Category</span>
-          <h3 class="font-bold text-base leading-tight" id="modalIssueTitle">Issue Title</h3>
+          <h3 class="font-bold text-sm text-slate-900" id="resModalToolName">Reserve Equipment</h3>
+          <p class="text-slate-500 text-[11px]" id="resModalToolPrice"></p>
         </div>
-        <button onclick="closeModal('issueDetailModal')" class="text-white/80 hover:text-white p-1 rounded-lg">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <button onclick="closeModal('modalReserve')" class="text-slate-400 hover:text-slate-600">✕</button>
       </div>
 
-      <div class="p-6 overflow-y-auto space-y-5">
-        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
-          <div class="flex items-center justify-between text-xs text-slate-500">
-            <span id="modalIssueReporter"><i class="fa-regular fa-user mr-1"></i> Reported by resident</span>
-            <span id="modalIssueDate"><i class="fa-regular fa-clock mr-1"></i> 2 days ago</span>
-          </div>
-          <p class="text-sm text-slate-700" id="modalIssueDesc">Issue description...</p>
-          <div class="pt-2 flex items-center space-x-2 text-xs font-semibold text-slate-500">
-            <i class="fa-solid fa-location-dot text-rose-500"></i>
-            <span id="modalIssueLocation">Location</span>
-          </div>
-        </div>
-
-        <!-- Updates Timeline -->
+      <div class="space-y-3 text-xs">
         <div>
-          <h4 class="font-bold text-sm text-slate-900 mb-3 flex items-center">
-            <i class="fa-solid fa-clock-rotate-left mr-2 text-civic-500"></i> Activity & City Updates
-          </h4>
-          <div id="modalIssueUpdatesList" class="space-y-3">
-            <!-- Timeline items rendered via JS -->
-          </div>
+          <label class="block font-bold text-slate-700 mb-1">Your Name *</label>
+          <input type="text" id="resBorrowerName" placeholder="e.g. Raymond Lee"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
         </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Your Malaysian Address / House No. *</label>
+          <input type="text" id="resBorrowerAddress" placeholder="e.g. No. 15, Jalan Harmoni 3/4"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+        </div>
+      </div>
 
-        <!-- Add Update / Comment Form -->
-        <form id="addUpdateForm" onsubmit="handleAddIssueUpdate(event)" class="pt-3 border-t border-slate-100 space-y-2">
-          <input type="hidden" id="modalIssueCurrentId">
-          <label class="block text-xs font-bold text-slate-700 uppercase">Post an update or neighbor note</label>
-          <div class="flex gap-2">
-            <input type="text" id="newUpdateText" required placeholder="e.g. City crew spotted taking measurements at 10 AM..."
-              class="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-civic-500/20 focus:border-civic-500 outline-hidden">
-            <button type="submit" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition">
-              Add Note
-            </button>
-          </div>
-        </form>
+      <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+        <button onclick="closeModal('modalReserve')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+        <button onclick="confirmReservation()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white">Confirm Booking</button>
       </div>
     </div>
   </div>
 
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 translate-y-24 opacity-0 transition-all duration-200 pointer-events-none">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl text-xs font-semibold shadow-lg flex items-center gap-2" id="toastContent">
+      <i class="fa-solid fa-circle-check text-emerald-400"></i>
+      <span id="toastMsg">Action completed successfully.</span>
+    </div>
+  </div>
 
   <script>
-    // Application State
-    let currentTab = 'overview';
-
-    // Mock Data: Shared Equipment
-    let equipmentList = [
+    // Authentic Malaysian Initial Data Store
+    const DEFAULT_TOOLS = [
       {
-        id: 'eq-1',
-        name: 'Honda 21" Self-Propelled Lawn Mower',
-        category: 'Lawn & Garden',
-        condition: 'Good Condition',
-        pricing: 'Free borrow ($25 refundable deposit)',
-        owner: 'Marcus (Oakridge East)',
-        status: 'Available',
+        id: 'tool-1',
+        name: 'Honda 4-Stroke Petrol Lawn Mower',
+        category: 'Gardening & Lawn',
         icon: 'fa-seedling',
-        color: 'emerald',
-        description: 'Starts on 1st pull, rear bagger included. Clean fuel provided; please return with full tank of regular gas.',
-        pickupInfo: 'Pick up at 412 Birch St garage after 5 PM.',
-        lastBorrowed: 'Last used 3 days ago'
+        price: 'RM 15 / day',
+        street: 'No. 28, Jalan Harmoni 3/2, Precinct 4',
+        owner: 'Uncle Wong',
+        phone: '+60 12-345 6789',
+        desc: 'Includes fresh fuel & grass catcher bag. Suitable for corner lot lawns.',
+        status: 'Available',
+        reservedBy: null
       },
       {
-        id: 'eq-2',
-        name: 'Simpson 3200 PSI Gas Pressure Washer',
-        category: 'Cleaning & Washers',
-        condition: 'Like New',
-        pricing: '$10 / day maintenance fund',
-        owner: 'Elena R. (Maple Grove)',
-        status: 'Available',
+        id: 'tool-2',
+        name: 'Kärcher K4 High Pressure Washer (130 Bar)',
+        category: 'Cleaning',
         icon: 'fa-shower',
-        color: 'cyan',
-        description: 'Includes 5 quick-connect nozzle tips, 25-ft hose, and surface cleaner attachment for driveways.',
-        pickupInfo: 'Side gate pickup. Quick demo available.',
-        lastBorrowed: 'Cleaned and ready'
+        price: 'RM 10 / day',
+        street: 'No. 5, Persiaran Seri Impian 1',
+        owner: 'En. Faizal',
+        phone: '+60 19-876 5432',
+        desc: 'Includes 10m high-pressure hose and dirt blaster nozzle for driveway moss.',
+        status: 'Available',
+        reservedBy: null
       },
       {
-        id: 'eq-3',
-        name: 'EGO 56V Cordless Hedge Trimmer 24"',
-        category: 'Lawn & Garden',
-        condition: 'Good Condition',
-        pricing: 'Free community loan',
-        owner: 'Kenji T. (West Ridge)',
+        id: 'tool-3',
+        name: '12-Step Heavy Duty Telescopic Aluminum Ladder',
+        category: 'Gardening & Lawn',
+        icon: 'fa-stairs',
+        price: 'Free',
+        street: 'No. 88, Lorong Melati 5, Precinct 2',
+        owner: 'Mr. David Tan',
+        phone: '+60 16-222 3344',
+        desc: 'Safely reaches roof gutters, awning lights, and high tree trimming.',
         status: 'Reserved',
-        icon: 'fa-scissors',
-        color: 'teal',
-        description: 'Dual-action blades, includes 2.5Ah battery and rapid charger. Lightweight and very quiet.',
-        pickupInfo: 'Reserved until tomorrow 6 PM by Liam.',
-        lastBorrowed: 'Due back tomorrow'
+        reservedBy: 'Hafiz (Jalan Melati 5/1)'
       },
       {
-        id: 'eq-4',
-        name: 'Werner 22-Ft Telescoping Multi-Position Ladder',
-        category: 'Ladders & Access',
-        condition: 'Good Condition',
-        pricing: 'Free ($30 deposit)',
-        owner: 'Priya K. (Oakridge South)',
-        status: 'Available',
-        icon: 'fa-bars-staggered',
-        color: 'amber',
-        description: 'Converts to step ladder, extension ladder, stairway step, and 90-degree position. 300 lb rating.',
-        pickupInfo: 'Driveway access. Requires SUV or truck bed.',
-        lastBorrowed: 'Available anytime'
-      },
-      {
-        id: 'eq-5',
-        name: 'Bissell Little Green Pet Carpet Cleaner',
-        category: 'Cleaning & Washers',
-        condition: 'Like New',
-        pricing: '$5 / day or swap',
-        owner: 'Hannah B. (Central Park)',
-        status: 'In Use',
-        icon: 'fa-soap',
-        color: 'blue',
-        description: 'Portable deep cleaner for upholstery, car seats, and pet spot cleaning. 8oz formula included.',
-        pickupInfo: 'Currently on loan to #18.',
-        lastBorrowed: 'Expected back Friday'
-      },
-      {
-        id: 'eq-6',
-        name: 'DeWalt 20V Max Hammer Drill & Impact Driver',
+        id: 'tool-4',
+        name: 'Bosch Professional Rotary Hammer Drill',
         category: 'Power Tools',
-        condition: 'Well Used / Reliable',
-        pricing: 'Free community borrow',
-        owner: 'Carlos V. (Highland Ave)',
-        status: 'Available',
         icon: 'fa-screwdriver-wrench',
-        color: 'violet',
-        description: 'Kit includes 2 batteries, charger, masonry drill bit set, and tough system case.',
-        pickupInfo: 'Call before picking up.',
-        lastBorrowed: 'Returned yesterday'
+        price: 'RM 10 / day',
+        street: 'No. 12, Jalan Meranti 4, Precinct 1',
+        owner: 'Muthu',
+        phone: '+60 17-889 2314',
+        desc: 'Comes with SDS-plus masonry drill bits for curtain railing installation.',
+        status: 'Available',
+        reservedBy: null
       }
     ];
 
-    // Mock Data: Civic Issues
-    let issuesList = [
+    const DEFAULT_ISSUES = [
       {
         id: 'iss-1',
-        title: 'Deep pothole on Elm Ave near elementary crosswalk',
-        category: 'Roads & Potholes',
-        severity: 'Urgent',
-        location: 'Elm Ave & 4th Street (near School Zone)',
-        description: 'Large crater (roughly 6 inches deep) causing cars to swerve abruptly into the oncoming bike lane.',
-        reporter: 'Rachel Diaz',
-        reportedDate: 'Yesterday, 8:45 AM',
-        status: 'In Progress',
-        votes: 14,
+        title: 'Deep Cavity Pothole near Roundabout',
+        category: 'Pothole & Roads',
+        priority: 'Urgent',
+        location: 'In front of No. 24, Jalan Harmoni 3/2, Precinct 4',
+        desc: 'Roughly 1.5 ft wide pothole. Danger for motorbikes and cyclists especially during heavy downpours.',
+        date: '12 Oct 2026',
+        upvotes: 19,
         hasUpvoted: false,
-        updates: [
-          { text: 'Issue submitted and confirmed by 12 neighbors.', author: 'Community System', time: 'Yesterday' },
-          { text: 'Report ticket #4812 created with City Public Works.', author: 'Admin Sarah', time: 'Today 9:00 AM' },
-          { text: 'City road crew marked area with safety cone pending asphalt delivery.', author: 'Neighbor Ken', time: 'Today 1:15 PM' }
-        ]
+        status: 'In Progress'
       },
       {
         id: 'iss-2',
-        title: 'Flickering / burnt-out streetlight at Pine Ridge cul-de-sac',
-        category: 'Street Lighting',
-        severity: 'Medium',
-        location: 'Pole #42, cul-de-sac end of Pine Ridge Way',
-        description: 'Light has been dead for 4 nights, making the walkway pitch dark for evening dog walkers.',
-        reporter: 'Arthur Pendelton',
-        reportedDate: '3 days ago',
-        status: 'Open',
-        votes: 7,
+        title: 'Streetlight Pole #TL-14 Light Blackout',
+        category: 'Streetlights',
+        priority: 'Normal',
+        location: 'Cross junction of Jalan Meranti 4 & Lorong 4/B',
+        desc: 'Bulb flickered for days and is now completely dark at night, affecting intersection visibility.',
+        date: '10 Oct 2026',
+        upvotes: 14,
         hasUpvoted: false,
-        updates: [
-          { text: 'Initial report filed by resident.', author: 'Arthur', time: '3 days ago' }
-        ]
+        status: 'Reported'
       },
       {
         id: 'iss-3',
-        title: 'Broken swing chain link at Oakridge Central Playground',
-        category: 'Parks & Playgrounds',
-        severity: 'Urgent',
-        location: 'Central Park Play Area, Toddler Swing Bay',
-        description: 'Top link has sheered partially. Swing currently tied up with temporary caution tape to prevent toddler injuries.',
-        reporter: 'Maya Lin',
-        reportedDate: 'Oct 11',
-        status: 'In Progress',
-        votes: 19,
+        title: 'Clogged Perimeter Monsoon Drain (Longkang)',
+        category: 'Clogged Drain (Longkang)',
+        priority: 'Urgent',
+        location: 'Beside Surau Al-Hidayah, Persiaran Seri Impian 1',
+        desc: 'Accumulated dead tree branches and silt obstructing water outlet. Stagnant water posing Aedes mosquito hazard.',
+        date: '08 Oct 2026',
+        upvotes: 27,
         hasUpvoted: true,
-        updates: [
-          { text: 'Parks Department notified via emergency hotline.', author: 'Maya Lin', time: 'Oct 11' },
-          { text: 'Replacement chain ordered by District Maintenance team.', author: 'District Officer', time: 'Yesterday' }
-        ]
+        status: 'Reported'
       },
       {
         id: 'iss-4',
-        title: 'Fallen heavy oak branch blocking north sidewalk',
-        category: 'Fallen Trees / Debris',
-        severity: 'Medium',
-        location: 'Across 128 North Ridge Blvd sidewalk',
-        description: 'Large limb snapped during Sunday wind gusts. Pedestrians and strollers forced onto the street.',
-        reporter: 'David Thorne',
-        reportedDate: 'Oct 09',
-        status: 'Resolved',
-        votes: 11,
+        title: 'Broken Kids Swing Chain & Safety Hook',
+        category: 'Damaged Playground',
+        priority: 'Normal',
+        location: 'Central Playground, Jalan Tasik Utama 2',
+        desc: 'Right swing suspension link snapped. Needs replacement link to prevent child injury.',
+        date: '05 Oct 2026',
+        upvotes: 8,
         hasUpvoted: false,
-        updates: [
-          { text: 'Reported by morning runner.', author: 'David', time: 'Oct 09' },
-          { text: 'Community volunteer chainsaw crew cleared branch into mulch bags.', author: 'Neighbor Carlos', time: 'Oct 10' }
-        ]
-      },
-      {
-        id: 'iss-5',
-        title: 'Sprinkler head cracked creating standing pool on public turf',
-        category: 'Water Leak / Drainage',
-        severity: 'Low',
-        location: 'Oakridge Community Garden perimeter',
-        description: 'Irrigation valve leaks when active, creating a muddy ditch that overflows into walking pavers.',
-        reporter: 'Chloe G.',
-        reportedDate: '4 days ago',
-        status: 'Open',
-        votes: 3,
-        hasUpvoted: false,
-        updates: [
-          { text: 'Irrigation timer temporarily scaled back.', author: 'Chloe', time: '3 days ago' }
-        ]
+        status: 'Resolved'
       }
     ];
 
-    function switchTab(tabId) {
-      currentTab = tabId;
-      const tabs = ['overview', 'equipment', 'issues'];
-      
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-${t}`);
-        const panel = document.getElementById(`view-${t}`);
-        if (t === tabId) {
-          btn.className = "tab-btn px-3.5 py-2 rounded-lg transition-all bg-white text-slate-900 shadow-xs font-bold";
-          panel.classList.remove('hidden');
-        } else {
-          btn.className = "tab-btn px-3.5 py-2 rounded-lg transition-all text-slate-600 hover:text-slate-900";
-          panel.classList.add('hidden');
-        }
-      });
-
-      if (tabId === 'overview') {
-        renderOverview();
-      } else if (tabId === 'equipment') {
-        renderEquipment();
-      } else if (tabId === 'issues') {
-        renderIssues();
+    // State initialization with LocalStorage
+    let tools = JSON.parse(localStorage.getItem('my_township_tools')) || DEFAULT_TOOLS;
+    let issues = JSON.parse(localStorage.getItem('my_township_issues')) || DEFAULT_ISSUES;
+    
+    // Migrate legacy "Open" statuses to "Reported"
+    issues = issues.map(iss => {
+      if (iss.status === 'Open') {
+        return { ...iss, status: 'Reported' };
       }
-      updateStats();
+      return iss;
+    });
+    let currentResToolId = null;
+
+    function saveState() {
+      localStorage.setItem('my_township_tools', JSON.stringify(tools));
+      localStorage.setItem('my_township_issues', JSON.stringify(issues));
+      updateBadgeCounts();
     }
 
-    function updateStats() {
-      const activeTools = equipmentList.filter(e => e.status === 'Available').length;
-      const activeRentals = equipmentList.filter(e => e.status === 'In Use' || e.status === 'Reserved').length;
-      const openIssues = issuesList.filter(i => i.status !== 'Resolved').length;
+    function updateBadgeCounts() {
+      document.getElementById('toolsBadgeCount').textContent = tools.length;
+      document.getElementById('issuesBadgeCount').textContent = issues.length;
+    }
 
-      document.getElementById('stat-active-equipment').textContent = activeTools;
-      document.getElementById('stat-active-rentals').textContent = activeRentals;
-      document.getElementById('stat-open-issues').textContent = openIssues;
+    function switchTab(tab) {
+      const tabTools = document.getElementById('tabBtnTools');
+      const tabIssues = document.getElementById('tabBtnIssues');
+      const secTools = document.getElementById('sectionTools');
+      const secIssues = document.getElementById('sectionIssues');
+
+      if (tab === 'tools') {
+        tabTools.className = "tab-active px-3.5 sm:px-4 py-1.5 rounded-lg transition-all flex items-center gap-2";
+        tabIssues.className = "px-3.5 sm:px-4 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-2";
+        secTools.classList.remove('hidden');
+        secIssues.classList.add('hidden');
+        renderEquipment();
+      } else {
+        tabIssues.className = "tab-active px-3.5 sm:px-4 py-1.5 rounded-lg transition-all flex items-center gap-2 text-rose-700";
+        tabTools.className = "px-3.5 sm:px-4 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-2";
+        secIssues.classList.remove('hidden');
+        secTools.classList.add('hidden');
+        renderIssues();
+      }
     }
 
     function renderEquipment() {
-      const container = document.getElementById('equipmentGrid');
-      const emptyState = document.getElementById('equipmentEmptyState');
-      const query = (document.getElementById('equipmentSearch').value || '').toLowerCase().trim();
-      const categoryFilter = document.getElementById('equipmentCategoryFilter').value;
-      const statusFilter = document.getElementById('equipmentStatusFilter').value;
+      const grid = document.getElementById('equipmentGrid');
+      const empty = document.getElementById('equipmentEmpty');
+      const query = (document.getElementById('toolSearchInput')?.value || '').toLowerCase().trim();
+      const category = document.getElementById('toolCategoryFilter')?.value || 'All';
 
-      const filtered = equipmentList.filter(item => {
-        const matchesQuery = item.name.toLowerCase().includes(query) ||
-                             item.description.toLowerCase().includes(query) ||
-                             item.owner.toLowerCase().includes(query);
-        const matchesCat = (categoryFilter === 'All') || (item.category === categoryFilter);
-        const matchesStatus = (statusFilter === 'All') || (item.status === statusFilter);
-        return matchesQuery && matchesCat && matchesStatus;
+      const filtered = tools.filter(item => {
+        const matchesQuery = !query || 
+          item.name.toLowerCase().includes(query) || 
+          item.street.toLowerCase().includes(query) || 
+          item.owner.toLowerCase().includes(query) ||
+          item.desc.toLowerCase().includes(query);
+        const matchesCategory = (category === 'All' || item.category === category);
+        return matchesQuery && matchesCategory;
       });
 
       if (filtered.length === 0) {
-        container.innerHTML = '';
-        emptyState.classList.remove('hidden');
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
         return;
       }
-      emptyState.classList.add('hidden');
+      empty.classList.add('hidden');
 
-      container.innerHTML = filtered.map(item => {
-        let statusBadge = '';
-        let buttonState = '';
-
-        if (item.status === 'Available') {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span> Available
-          </span>`;
-          buttonState = `<button onclick="openReserveModal('${item.id}')" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-sm transition">
-            <i class="fa-solid fa-calendar-check mr-1.5"></i> Request to Borrow
-          </button>`;
-        } else if (item.status === 'Reserved') {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span> Reserved
-          </span>`;
-          buttonState = `<button onclick="showToast('This tool is reserved for an upcoming booking.', 'info')" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
-            <i class="fa-regular fa-clock mr-1.5"></i> View Availability
-          </button>`;
-        } else {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
-            <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span> In Use
-          </span>`;
-          buttonState = `<button onclick="showToast('Currently borrowed by a neighbor. Check back soon!', 'info')" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-500 transition">
-            <i class="fa-solid fa-user-lock mr-1.5"></i> Currently Loaned Out
-          </button>`;
-        }
+      grid.innerHTML = filtered.map(t => {
+        const isAvail = t.status === 'Available';
+        const cleanPhone = t.phone.replace(/[^0-9]/g, '');
+        const waText = encodeURIComponent(`Hi ${t.owner}, I am your neighbor from the township. I would like to check if your "${t.name}" is available to borrow/rent. Thank you!`);
+        const waLink = `https://wa.me/${cleanPhone}?text=${waText}`;
 
         return `
-          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between hover:border-slate-300 transition group">
             <div>
-              <div class="flex items-start justify-between gap-3 mb-3">
-                <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center text-xl shrink-0 group-hover:bg-brand-100 transition">
-                  <i class="fa-solid ${item.icon}"></i>
-                </div>
-                <div>${statusBadge}</div>
+              <!-- Top tags & price -->
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  ${escapeHTML(t.price)}
+                </span>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                  isAvail ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'
+                }">
+                  ${isAvail ? '● Available' : '○ Reserved'}
+                </span>
               </div>
 
-              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">${item.category}</div>
-              <h3 class="font-bold text-slate-900 text-base mb-1.5 group-hover:text-brand-700 transition">${escapeHTML(item.name)}</h3>
-              <p class="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed">${escapeHTML(item.description)}</p>
+              <!-- Item Title & category -->
+              <div class="flex items-start gap-2.5 mb-2">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 shrink-0 mt-0.5 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition">
+                  <i class="fa-solid ${t.icon || 'fa-toolbox'} text-sm"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm leading-snug">${escapeHTML(t.name)}</h3>
+                  <span class="text-[11px] font-medium text-slate-400">${escapeHTML(t.category)}</span>
+                </div>
+              </div>
 
-              <div class="bg-slate-50 rounded-2xl p-3 space-y-1.5 border border-slate-100 text-xs text-slate-600 mb-4">
-                <div class="flex items-center justify-between">
-                  <span class="text-slate-400"><i class="fa-solid fa-tag mr-1 text-slate-400"></i> Terms:</span>
-                  <span class="font-bold text-slate-800">${escapeHTML(item.pricing)}</span>
+              <p class="text-xs text-slate-500 mb-4 line-clamp-2">${escapeHTML(t.desc)}</p>
+
+              <!-- Address and owner details in Malaysian format -->
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 text-xs space-y-1 mb-4">
+                <div class="flex items-center text-slate-600 gap-1.5">
+                  <i class="fa-solid fa-location-dot text-emerald-600 text-[11px]"></i>
+                  <span class="font-medium truncate">${escapeHTML(t.street)}</span>
                 </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-slate-400"><i class="fa-solid fa-user mr-1 text-slate-400"></i> Lender:</span>
-                  <span class="font-medium text-slate-700">${escapeHTML(item.owner)}</span>
+                <div class="flex items-center justify-between text-slate-500 pt-0.5 text-[11px]">
+                  <span>Owner: <strong class="text-slate-700">${escapeHTML(t.owner)}</strong></span>
+                  <span>${escapeHTML(t.phone)}</span>
                 </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-slate-400"><i class="fa-solid fa-check-double mr-1 text-slate-400"></i> Condition:</span>
-                  <span class="text-slate-700">${escapeHTML(item.condition)}</span>
-                </div>
+                ${t.reservedBy ? `
+                  <div class="pt-1 text-[11px] text-amber-700 font-semibold border-t border-slate-200/60">
+                    Reserved by: ${escapeHTML(t.reservedBy)}
+                  </div>
+                ` : ''}
               </div>
             </div>
 
-            <div>
-              ${buttonState}
+            <!-- Action buttons -->
+            <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
+              <a href="${waLink}" target="_blank" rel="noopener noreferrer" 
+                class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition shadow-xs">
+                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+              </a>
+
+              ${isAvail ? `
+                <button onclick="openReserveModal('${t.id}')" 
+                  class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white transition shadow-xs active:scale-95">
+                  Reserve
+                </button>
+              ` : `
+                <button onclick="toggleReturnTool('${t.id}')" 
+                  class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-700 transition">
+                  Mark Available
+                </button>
+              `}
             </div>
           </div>
         `;
@@ -996,119 +628,97 @@
     }
 
     function renderIssues() {
-      const container = document.getElementById('issuesList');
-      const emptyState = document.getElementById('issuesEmptyState');
-      const query = (document.getElementById('issueSearch').value || '').toLowerCase().trim();
-      const statusFilter = document.getElementById('issueStatusFilter').value;
-      const severityFilter = document.getElementById('issueSeverityFilter').value;
+      const list = document.getElementById('issuesList');
+      const empty = document.getElementById('issuesEmpty');
+      const query = (document.getElementById('issueSearchInput')?.value || '').toLowerCase().trim();
+      const category = document.getElementById('issueCategoryFilter')?.value || 'All';
+      const status = document.getElementById('issueStatusFilter')?.value || 'All';
 
-      const filtered = issuesList.filter(item => {
-        const matchesQuery = item.title.toLowerCase().includes(query) ||
-                             item.description.toLowerCase().includes(query) ||
-                             item.location.toLowerCase().includes(query);
-        const matchesStatus = (statusFilter === 'All') || (item.status === statusFilter);
-        const matchesSeverity = (severityFilter === 'All') || 
-                                (severityFilter === 'Urgent' ? (item.severity === 'Urgent') : item.severity === severityFilter);
-        return matchesQuery && matchesStatus && matchesSeverity;
+      const filtered = issues.filter(item => {
+        const matchesQuery = !query || 
+          item.title.toLowerCase().includes(query) || 
+          item.location.toLowerCase().includes(query) || 
+          item.desc.toLowerCase().includes(query);
+        const matchesCategory = (category === 'All' || item.category === category);
+        const matchesStatus = (status === 'All' || item.status === status);
+        return matchesQuery && matchesCategory && matchesStatus;
       });
 
       if (filtered.length === 0) {
-        container.innerHTML = '';
-        emptyState.classList.remove('hidden');
+        list.innerHTML = '';
+        empty.classList.remove('hidden');
         return;
       }
-      emptyState.classList.add('hidden');
+      empty.classList.add('hidden');
 
-      container.innerHTML = filtered.map(item => {
-        let statusBadge = '';
-        if (item.status === 'Open') {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span> Open
-          </span>`;
-        } else if (item.status === 'In Progress') {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span> In Progress
-          </span>`;
-        } else {
-          statusBadge = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span> Resolved
-          </span>`;
+      list.innerHTML = filtered.map(item => {
+        let statusBadge = 'bg-amber-100 text-amber-800 border-amber-200';
+        let statusTitle = 'Report received, awaiting review or contractor assignment';
+
+        if (item.status === 'In Progress') {
+          statusBadge = 'bg-blue-100 text-blue-800 border-blue-200';
+          statusTitle = 'Contractor or maintenance team is actively resolving this';
+        } else if (item.status === 'Resolved') {
+          statusBadge = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+          statusTitle = 'Issue has been inspected and resolved';
         }
 
-        let severityBadge = '';
-        if (item.severity === 'Urgent') {
-          severityBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-2xs font-extrabold uppercase tracking-wide bg-rose-100 text-rose-700">
-            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Urgent Hazard
-          </span>`;
-        } else if (item.severity === 'Medium') {
-          severityBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-2xs font-bold uppercase tracking-wide bg-orange-100 text-orange-700">
-            Medium Priority
-          </span>`;
-        } else {
-          severityBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-lg text-2xs font-bold uppercase tracking-wide bg-slate-100 text-slate-600">
-            Low Priority
-          </span>`;
-        }
-
-        const upvoteBtnClass = item.hasUpvoted 
-          ? "bg-rose-50 text-rose-600 border border-rose-200 shadow-xs" 
-          : "bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-transparent";
+        const isUrgent = item.priority === 'Urgent';
 
         return `
-          <div class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-xs hover:border-slate-300 transition flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between">
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start justify-between gap-4 hover:border-slate-300 transition">
             
-            <!-- Left: Upvote Box & Info -->
-            <div class="flex items-start gap-4 flex-1">
-              
-              <!-- Upvote Button -->
-              <button onclick="toggleUpvote('${item.id}')" class="flex flex-col items-center justify-center min-w-[56px] py-2.5 px-2 rounded-2xl transition ${upvoteBtnClass}">
-                <i class="fa-solid fa-arrow-up text-sm ${item.hasUpvoted ? 'text-rose-600 scale-110' : 'text-slate-400'}"></i>
-                <span class="font-extrabold text-sm mt-0.5">${item.votes}</span>
-                <span class="text-[9px] uppercase font-bold tracking-tight">${item.hasUpvoted ? 'Voted' : 'Me Too'}</span>
-              </button>
+            <!-- Left: Upvote button -->
+            <button onclick="toggleIssueUpvote('${item.id}')" 
+              class="flex sm:flex-col items-center justify-center gap-1.5 px-3 py-2 sm:w-14 rounded-xl border text-xs transition shrink-0 ${
+                item.hasUpvoted 
+                  ? 'bg-rose-50 border-rose-300 text-rose-700 font-extrabold shadow-xs' 
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
+              }">
+              <i class="fa-solid fa-arrow-up text-xs"></i>
+              <span class="text-xs">${item.upvotes}</span>
+              <span class="text-[10px] hidden sm:block ${item.hasUpvoted ? 'text-rose-600' : 'text-slate-400'}">Upvote</span>
+            </button>
 
-              <div class="space-y-1.5 flex-1">
-                <div class="flex flex-wrap items-center gap-2">
-                  ${severityBadge}
-                  <span class="text-xs font-semibold text-slate-400">${escapeHTML(item.category)}</span>
-                  <span class="text-xs text-slate-300">•</span>
-                  <span class="text-xs text-slate-400">${escapeHTML(item.reportedDate)}</span>
-                </div>
-
-                <h3 class="font-bold text-slate-900 text-base leading-snug hover:text-rose-600 transition cursor-pointer" onclick="openIssueDetail('${item.id}')">
-                  ${escapeHTML(item.title)}
-                </h3>
-
-                <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                  ${escapeHTML(item.description)}
-                </p>
-
-                <div class="flex flex-wrap items-center gap-y-1 gap-x-4 pt-1 text-xs text-slate-500">
-                  <div class="flex items-center text-slate-700 font-medium">
-                    <i class="fa-solid fa-location-dot text-rose-500 mr-1.5"></i>
-                    ${escapeHTML(item.location)}
-                  </div>
-                  <div class="flex items-center">
-                    <i class="fa-regular fa-comment-dots mr-1.5 text-slate-400"></i>
-                    ${item.updates.length} timeline notes
-                  </div>
-                </div>
+            <!-- Middle: Main details -->
+            <div class="flex-1 space-y-1.5 w-full">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                  ${escapeHTML(item.category)}
+                </span>
+                ${isUrgent ? `
+                  <span class="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                    ⚠️ Urgent
+                  </span>
+                ` : ''}
+                <span class="text-[11px] text-slate-400">Reported on ${item.date}</span>
               </div>
 
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">${escapeHTML(item.title)}</h3>
+              
+              <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                <i class="fa-solid fa-location-dot text-rose-600 text-[11px]"></i>
+                <span>${escapeHTML(item.location)}</span>
+              </div>
+
+              <p class="text-xs text-slate-500 pt-1 leading-relaxed">${escapeHTML(item.desc)}</p>
             </div>
 
-            <!-- Right: Status & Action -->
-            <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto shrink-0 gap-3">
-              <div>${statusBadge}</div>
-              <div class="flex items-center space-x-2">
-                <button onclick="openIssueDetail('${item.id}')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 transition">
-                  <i class="fa-solid fa-list-check mr-1.5"></i> View & Update
-                </button>
-                ${item.status !== 'Resolved' ? `
-                  <button onclick="markIssueResolved('${item.id}')" title="Mark as fixed" class="p-2 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition border border-emerald-200">
-                    <i class="fa-solid fa-check"></i>
-                  </button>
-                ` : ''}
+            <!-- Right: Status badge & management dropdown -->
+            <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+              <span class="text-xs font-bold px-3 py-1 rounded-lg border ${statusBadge}" title="${statusTitle}">
+                ● ${item.status}
+              </span>
+
+              <!-- Status Switcher for Residents / Committee -->
+              <div class="flex items-center gap-1.5 text-xs">
+                <span class="text-[11px] text-slate-400">Update:</span>
+                <select onchange="updateIssueStatus('${item.id}', this.value)" 
+                  class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1 font-semibold focus:outline-none focus:border-emerald-600">
+                  <option value="Reported" ${item.status === 'Reported' ? 'selected' : ''}>Reported</option>
+                  <option value="In Progress" ${item.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                  <option value="Resolved" ${item.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                </select>
               </div>
             </div>
 
@@ -1117,311 +727,173 @@
       }).join('');
     }
 
-    function renderOverview() {
-      // Spotlight top 3 available tools
-      const toolSpotlight = document.getElementById('overview-featured-tools');
-      const availableTools = equipmentList.filter(e => e.status === 'Available').slice(0, 3);
-      
-      toolSpotlight.innerHTML = availableTools.map(item => `
-        <div class="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-xl bg-white text-brand-600 flex items-center justify-center text-sm shadow-xs border border-slate-200">
-              <i class="fa-solid ${item.icon}"></i>
-            </div>
-            <div>
-              <div class="font-bold text-slate-900 text-xs sm:text-sm line-clamp-1">${escapeHTML(item.name)}</div>
-              <div class="text-xs text-slate-500 font-medium">${escapeHTML(item.pricing)} • by ${escapeHTML(item.owner.split(' ')[0])}</div>
-            </div>
-          </div>
-          <button onclick="openReserveModal('${item.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white shrink-0">
-            Borrow
-          </button>
-        </div>
-      `).join('');
-
-      // Top priority issues
-      const issueSpotlight = document.getElementById('overview-priority-issues');
-      const openIssues = [...issuesList]
-        .filter(i => i.status !== 'Resolved')
-        .sort((a, b) => b.votes - a.votes)
-        .slice(0, 3);
-
-      issueSpotlight.innerHTML = openIssues.map(issue => `
-        <div class="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition flex items-center justify-between">
-          <div class="flex items-center space-x-3 pr-2">
-            <button onclick="toggleUpvote('${issue.id}')" class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-rose-600 font-bold text-xs flex flex-col items-center justify-center shrink-0">
-              <i class="fa-solid fa-arrow-up text-[10px]"></i>
-              <span>${issue.votes}</span>
-            </button>
-            <div>
-              <div class="font-bold text-slate-900 text-xs sm:text-sm line-clamp-1">${escapeHTML(issue.title)}</div>
-              <div class="text-xs text-slate-500 flex items-center">
-                <i class="fa-solid fa-location-dot text-rose-500 mr-1 text-[10px]"></i>
-                <span class="line-clamp-1">${escapeHTML(issue.location)}</span>
-              </div>
-            </div>
-          </div>
-          <button onclick="openIssueDetail('${issue.id}')" class="text-xs font-bold text-slate-700 hover:text-rose-600 shrink-0">
-            Details
-          </button>
-        </div>
-      `).join('');
-    }
-
-    function openModal(modalId) {
-      document.getElementById(modalId).classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.add('hidden');
-      document.body.style.overflow = 'auto';
-    }
-
-    function openReserveModal(itemId) {
-      const item = equipmentList.find(e => e.id === itemId);
-      if (!item) return;
-
-      document.getElementById('reserveItemId').value = item.id;
-      document.getElementById('modalReserveToolName').textContent = item.name;
-      document.getElementById('modalReserveOwnerInfo').textContent = `Lender: ${item.owner}`;
-      document.getElementById('modalReservePricing').textContent = item.pricing;
-      document.getElementById('modalReserveLocation').textContent = item.pickupInfo;
-
-      // Set default dates
-      const today = new Date().toISOString().split('T')[0];
-      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-      document.getElementById('reserveStartDate').value = today;
-      document.getElementById('reserveEndDate').value = tomorrow;
-
-      openModal('reserveEquipmentModal');
-    }
-
-    function handleReserveSubmit(e) {
+    function handleNewTool(e) {
       e.preventDefault();
-      const itemId = document.getElementById('reserveItemId').value;
-      const borrowerName = document.getElementById('reserveBorrowerName').value;
-      const startDate = document.getElementById('reserveStartDate').value;
-      const endDate = document.getElementById('reserveEndDate').value;
+      const name = document.getElementById('newToolName').value.trim();
+      const category = document.getElementById('newToolCategory').value;
+      const price = document.getElementById('newToolPrice').value.trim();
+      const street = document.getElementById('newToolStreet').value.trim();
+      const owner = document.getElementById('newToolOwner').value.trim();
+      let phone = document.getElementById('newToolPhone').value.trim();
+      const desc = document.getElementById('newToolDesc').value.trim();
 
-      const item = equipmentList.find(e => e.id === itemId);
-      if (item) {
-        item.status = 'Reserved';
-        item.lastBorrowed = `Reserved by ${borrowerName} (${startDate} to ${endDate})`;
-      }
+      // Icon determination
+      let icon = 'fa-toolbox';
+      if (category === 'Gardening & Lawn') icon = 'fa-seedling';
+      if (category === 'Cleaning') icon = 'fa-shower';
+      if (category === 'Power Tools') icon = 'fa-screwdriver-wrench';
+      if (category === 'Event & Canopy') icon = 'fa-tent';
 
-      closeModal('reserveEquipmentModal');
-      document.getElementById('reserveForm').reset();
-      showToast(`Reservation request sent to ${item ? item.owner : 'neighbor'}! Check your SMS for pickup confirmation.`, 'success');
-
-      renderEquipment();
-      renderOverview();
-      updateStats();
-    }
-
-    function handleListToolSubmit(e) {
-      e.preventDefault();
-      const name = document.getElementById('toolName').value;
-      const category = document.getElementById('toolCategory').value;
-      const condition = document.getElementById('toolCondition').value;
-      const pricing = document.getElementById('toolPricing').value;
-      const owner = document.getElementById('toolOwner').value;
-      const icon = document.getElementById('toolIconPreset').value;
-      const description = document.getElementById('toolDescription').value || 'Available for community loan. Please handle with care.';
-
-      const newTool = {
-        id: 'eq-' + Date.now(),
+      tools.unshift({
+        id: 'tool-' + Date.now(),
         name,
         category,
-        condition,
-        pricing,
-        owner,
-        status: 'Available',
         icon,
-        description,
-        pickupInfo: 'Contact owner for front porch or garage handover.',
-        lastBorrowed: 'Just listed today'
-      };
+        price,
+        street,
+        owner,
+        phone,
+        desc: desc || 'Well-maintained equipment ready for neighbor use.',
+        status: 'Available',
+        reservedBy: null
+      });
 
-      equipmentList.unshift(newTool);
-      closeModal('listEquipmentModal');
-      document.getElementById('listToolForm').reset();
-      showToast(`"${name}" is now published to the neighborhood equipment board!`, 'success');
-
-      switchTab('equipment');
+      saveState();
+      renderEquipment();
+      closeModal('modalAddTool');
+      document.getElementById('formAddTool').reset();
+      showToast('Equipment listed successfully!');
     }
 
-    function handleReportIssueSubmit(e) {
+    function handleNewIssue(e) {
       e.preventDefault();
-      const title = document.getElementById('issueTitle').value;
-      const category = document.getElementById('issueCategory').value;
-      const severity = document.getElementById('issueSeverity').value;
-      const location = document.getElementById('issueLocation').value;
-      const description = document.getElementById('issueDescription').value;
-      const reporter = document.getElementById('issueReporter').value || 'Concerned Resident';
+      const title = document.getElementById('newIssueTitle').value.trim();
+      const category = document.getElementById('newIssueCategory').value;
+      const priority = document.getElementById('newIssuePriority').value;
+      const location = document.getElementById('newIssueLocation').value.trim();
+      const desc = document.getElementById('newIssueDesc').value.trim();
 
-      const newIssue = {
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+      issues.unshift({
         id: 'iss-' + Date.now(),
         title,
         category,
-        severity,
+        priority,
         location,
-        description,
-        reporter,
-        reportedDate: 'Just now',
-        status: 'Open',
-        votes: 1,
+        desc,
+        date: formattedDate,
+        upvotes: 1,
         hasUpvoted: true,
-        updates: [
-          { text: 'Incident reported to neighborhood board.', author: reporter, time: 'Just now' }
-        ]
-      };
-
-      issuesList.unshift(newIssue);
-      closeModal('reportIssueModal');
-      document.getElementById('reportIssueForm').reset();
-      showToast('Issue recorded! Neighbors can now review and upvote for municipality dispatch.', 'success');
-
-      switchTab('issues');
-    }
-
-    function toggleUpvote(issueId) {
-      const issue = issuesList.find(i => i.id === issueId);
-      if (!issue) return;
-
-      if (issue.hasUpvoted) {
-        issue.votes -= 1;
-        issue.hasUpvoted = false;
-        showToast('Vote removed.', 'info');
-      } else {
-        issue.votes += 1;
-        issue.hasUpvoted = true;
-        showToast('Thank you! Your vote pushed priority higher on the civic board.', 'success');
-      }
-
-      renderIssues();
-      renderOverview();
-    }
-
-    function markIssueResolved(issueId) {
-      const issue = issuesList.find(i => i.id === issueId);
-      if (!issue) return;
-
-      issue.status = 'Resolved';
-      issue.updates.push({
-        text: 'Marked as resolved by community member.',
-        author: 'Resident Verified',
-        time: 'Just now'
+        status: 'Reported'
       });
 
-      showToast(`"${issue.title}" marked as resolved! Great teamwork.`, 'success');
+      saveState();
       renderIssues();
-      renderOverview();
-      updateStats();
+      closeModal('modalAddIssue');
+      document.getElementById('formAddIssue').reset();
+      showToast('Issue reported to community board!');
     }
 
-    function openIssueDetail(issueId) {
-      const issue = issuesList.find(i => i.id === issueId);
-      if (!issue) return;
-
-      document.getElementById('modalIssueCurrentId').value = issue.id;
-      document.getElementById('modalIssueCategory').textContent = issue.category;
-      document.getElementById('modalIssueTitle').textContent = issue.title;
-      document.getElementById('modalIssueDesc').textContent = issue.description;
-      document.getElementById('modalIssueLocation').textContent = issue.location;
-      document.getElementById('modalIssueReporter').innerHTML = `<i class="fa-regular fa-user mr-1"></i> Reported by ${escapeHTML(issue.reporter)}`;
-      document.getElementById('modalIssueDate').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${escapeHTML(issue.reportedDate)}`;
-
-      renderIssueTimeline(issue);
-      openModal('issueDetailModal');
+    // Reservation flow
+    function openReserveModal(id) {
+      const tool = tools.find(t => t.id === id);
+      if (!tool) return;
+      currentResToolId = id;
+      document.getElementById('resModalToolName').textContent = tool.name;
+      document.getElementById('resModalToolPrice').textContent = `${tool.price} • Owner: ${tool.owner}`;
+      openModal('modalReserve');
     }
 
-    function renderIssueTimeline(issue) {
-      const container = document.getElementById('modalIssueUpdatesList');
-      if (!issue.updates || issue.updates.length === 0) {
-        container.innerHTML = '<p class="text-xs text-slate-400 italic">No notes posted yet.</p>';
+    function confirmReservation() {
+      const borrower = document.getElementById('resBorrowerName').value.trim();
+      const address = document.getElementById('resBorrowerAddress').value.trim();
+
+      if (!borrower || !address) {
+        showToast('Please provide your name and address.', true);
         return;
       }
 
-      container.innerHTML = issue.updates.map(u => `
-        <div class="flex items-start space-x-3 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-          <div class="w-2 h-2 rounded-full bg-brand-500 mt-1.5 shrink-0"></div>
-          <div class="flex-1">
-            <div class="text-slate-800 font-medium">${escapeHTML(u.text)}</div>
-            <div class="text-2xs text-slate-400 mt-0.5">${escapeHTML(u.author)} • ${escapeHTML(u.time)}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function handleAddIssueUpdate(e) {
-      e.preventDefault();
-      const issueId = document.getElementById('modalIssueCurrentId').value;
-      const textInput = document.getElementById('newUpdateText');
-      const text = textInput.value.trim();
-      if (!text) return;
-
-      const issue = issuesList.find(i => i.id === issueId);
-      if (issue) {
-        issue.updates.push({
-          text,
-          author: 'Neighbor Update',
-          time: 'Just now'
-        });
-        textInput.value = '';
-        renderIssueTimeline(issue);
-        renderIssues();
-        showToast('Timeline note posted to issue thread.', 'success');
+      const tool = tools.find(t => t.id === currentResToolId);
+      if (tool) {
+        tool.status = 'Reserved';
+        tool.reservedBy = `${borrower} (${address})`;
+        saveState();
+        renderEquipment();
+        closeModal('modalReserve');
+        document.getElementById('resBorrowerName').value = '';
+        document.getElementById('resBorrowerAddress').value = '';
+        showToast(`Equipment reserved for ${borrower}!`);
       }
     }
 
-    // Filter Reset Helpers
-    function resetEquipmentFilters() {
-      document.getElementById('equipmentSearch').value = '';
-      document.getElementById('equipmentCategoryFilter').value = 'All';
-      document.getElementById('equipmentStatusFilter').value = 'All';
-      renderEquipment();
+    function toggleReturnTool(id) {
+      const tool = tools.find(t => t.id === id);
+      if (tool) {
+        tool.status = 'Available';
+        tool.reservedBy = null;
+        saveState();
+        renderEquipment();
+        showToast('Equipment marked as Available.');
+      }
     }
 
-    function resetIssueFilters() {
-      document.getElementById('issueSearch').value = '';
-      document.getElementById('issueStatusFilter').value = 'All';
-      document.getElementById('issueSeverityFilter').value = 'All';
+    // Upvote toggle
+    function toggleIssueUpvote(id) {
+      const item = issues.find(i => i.id === id);
+      if (!item) return;
+
+      if (item.hasUpvoted) {
+        item.upvotes -= 1;
+        item.hasUpvoted = false;
+      } else {
+        item.upvotes += 1;
+        item.hasUpvoted = true;
+      }
+      saveState();
       renderIssues();
     }
 
-    // Helper: Toast Notifications
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      
-      const icon = type === 'success' 
-        ? 'fa-circle-check text-brand-600' 
-        : 'fa-circle-info text-sky-600';
-
-      const bg = 'bg-white border border-slate-200 text-slate-800 shadow-xl';
-
-      toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-2xl ${bg} max-w-sm transform translate-y-4 opacity-0 transition-all duration-300 text-xs sm:text-sm font-semibold`;
-      toast.innerHTML = `
-        <i class="fa-solid ${icon} text-lg"></i>
-        <div class="flex-1 leading-snug">${escapeHTML(message)}</div>
-      `;
-
-      container.appendChild(toast);
-
-      // Animate in
-      setTimeout(() => {
-        toast.classList.remove('translate-y-4', 'opacity-0');
-      }, 50);
-
-      // Remove after 3.5s
-      setTimeout(() => {
-        toast.classList.add('translate-y-4', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
+    // Update Issue status
+    function updateIssueStatus(id, newStatus) {
+      const item = issues.find(i => i.id === id);
+      if (item) {
+        item.status = newStatus;
+        saveState();
+        renderIssues();
+        showToast(`Issue status updated to ${newStatus}.`);
+      }
     }
 
-    // Helper: Sanitization
+    // Modal Helpers
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    // Toast alert
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toastMsg');
+      const icon = document.querySelector('#toastContent i');
+
+      text.textContent = msg;
+      if (isError) {
+        icon.className = 'fa-solid fa-circle-exclamation text-rose-400';
+      } else {
+        icon.className = 'fa-solid fa-circle-check text-emerald-400';
+      }
+
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 2400);
+    }
+
+    // Sanitization
     function escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -1432,9 +904,10 @@
         .replace(/'/g, '&#039;');
     }
 
-    window.onload = function () {
-      switchTab('overview');
-      updateStats();
+    window.onload = function() {
+      updateBadgeCounts();
+      renderEquipment();
+      renderIssues();
     };
   </script>
 </body>
