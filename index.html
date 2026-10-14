@@ -42,13 +42,34 @@
       -webkit-backdrop-filter: blur(4px);
     }
     input, select, textarea {
-      font-size: 14px !important;
+      font-size: 13.5px !important;
     }
-    /* Smooth transitions */
-    .tab-active {
-      background-color: #ffffff;
-      color: #047857;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+    .nav-tab-active {
+      background-color: #047857;
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(4, 120, 87, 0.18);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #receiptPrintArea, #receiptPrintArea * {
+        visibility: visible;
+      }
+      #receiptPrintArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -56,63 +77,115 @@
 
   <!-- TOP NAVIGATION HEADER -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6">
-      <div class="flex items-center justify-between h-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16 gap-3">
         
         <!-- App Title & Subtitle -->
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white text-xl shadow-xs">
+        <div class="flex items-center space-x-3 shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white text-lg shadow-xs font-bold">
             🏘️
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h1 class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">Township Community Board</h1>
-              <span class="hidden sm:inline-flex text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <h1 class="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight">Township Community Board</h1>
+              <span class="inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                 Malaysia
               </span>
             </div>
-            <p class="text-xs text-slate-500">Equipment sharing and neighborhood issue reports</p>
+            <p class="text-[11px] text-slate-500 hidden sm:block">Bandar Harmoni Central • Facilities, Equipment, Events & Billing</p>
           </div>
         </div>
 
-        <!-- Segmented Controls: 2 Tabs -->
-        <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold">
-          <button id="tabBtnTools" onclick="switchTab('tools')" 
-            class="tab-active px-3.5 sm:px-4 py-1.5 rounded-lg transition-all flex items-center gap-2">
-            <span>🛠️ Equipment Rental</span>
-            <span id="toolsBadgeCount" class="text-[11px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold">4</span>
-          </button>
-          <button id="tabBtnIssues" onclick="switchTab('issues')" 
-            class="px-3.5 sm:px-4 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-2">
-            <span>📢 Community Issues</span>
-            <span id="issuesBadgeCount" class="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 font-bold">4</span>
-          </button>
-        </nav>
+        <!-- Quick Resident Address Badge -->
+        <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs">
+          <i class="fa-solid fa-house-chimney text-emerald-700"></i>
+          <span class="text-slate-500">My Unit:</span>
+          <span class="font-bold text-slate-800" id="currentResidentUnit">No. 28, Jalan Harmoni 3/2</span>
+          <button onclick="changeResidentUnit()" class="text-[11px] font-semibold text-emerald-700 hover:underline ml-1">Change</button>
+        </div>
 
       </div>
+
+      <!-- Scrollable Tab Switcher -->
+      <nav class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-2 border-t border-slate-100 text-xs font-semibold">
+        <button id="navTabTools" onclick="switchNavTab('tools')" 
+          class="nav-tab-active px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-2">
+          <span>🛠️ Equipment & Kiosks</span>
+          <span id="badgeTools" class="text-[10px] px-1.5 py-0.2 rounded-full bg-white/20 text-white font-bold">4</span>
+        </button>
+
+        <button id="navTabFacilities" onclick="switchNavTab('facilities')" 
+          class="px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition-all flex items-center gap-2">
+          <span>🏛️ Facility Booking</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 font-bold" id="badgeFacilities">4</span>
+        </button>
+
+        <button id="navTabEvents" onclick="switchNavTab('events')" 
+          class="px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition-all flex items-center gap-2">
+          <span>📅 Community Events</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 font-bold" id="badgeEvents">3</span>
+        </button>
+
+        <button id="navTabIssues" onclick="switchNavTab('issues')" 
+          class="px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition-all flex items-center gap-2">
+          <span>📢 Issues & Reports</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 font-bold" id="badgeIssues">4</span>
+        </button>
+
+        <button id="navTabFees" onclick="switchNavTab('fees')" 
+          class="px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition-all flex items-center gap-2">
+          <span>💳 Management Fee</span>
+          <span id="badgeFeeDue" class="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 font-bold">Due</span>
+        </button>
+      </nav>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
 
     <!-- ============================================================== -->
-    <!-- SECTION 1: EQUIPMENT RENTAL                                    -->
+    <!-- 1. EQUIPMENT RENTAL & POWER BANK KIOSKS                       -->
     <!-- ============================================================== -->
-    <section id="sectionTools" class="space-y-5">
-      
-      <!-- Top Action & Search Bar -->
+    <section id="sectionTools" class="space-y-6">
+
+      <!-- Power Bank Kiosks Banner -->
+      <div class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 rounded-2xl p-4 sm:p-5 text-white shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-200 text-[10px] font-bold uppercase tracking-wider border border-emerald-400/30">
+                ⚡ 24/7 Accessibility
+              </span>
+              <span class="text-xs text-emerald-100 font-medium">IoT Smart Kiosks</span>
+            </div>
+            <h2 class="text-base sm:text-lg font-bold tracking-tight">Township Smart Power Bank Stations</h2>
+            <p class="text-xs text-emerald-100/90 mt-0.5 max-w-2xl">
+              Borrow quick-charge battery packs across key township points. Rate: <strong>RM 1.00/hour</strong> (First 30 minutes free for verified residents).
+            </p>
+          </div>
+          <button onclick="openModal('modalReportKioskIssue')" 
+            class="self-start md:self-center shrink-0 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/20 transition active:scale-95 flex items-center gap-1.5">
+            <i class="fa-solid fa-triangle-exclamation text-amber-300"></i>
+            <span>Report Kiosk Slot Error</span>
+          </button>
+        </div>
+
+        <!-- Kiosk Location Cards -->
+        <div id="kioskStationGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Equipment Rental Hub Header & Search -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        
-        <!-- Search input -->
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
           <input type="text" id="toolSearchInput" oninput="renderEquipment()" 
-            placeholder="Search equipment by name, street (e.g., Jalan Harmoni 3/2) or owner..."
+            placeholder="Search tools by name, Malaysian street (e.g., Jalan Harmoni 3/2) or owner..."
             class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition">
         </div>
 
-        <!-- Category & Add Button -->
         <div class="flex items-center gap-2">
           <select id="toolCategoryFilter" onchange="renderEquipment()" 
             class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-600">
@@ -126,55 +199,105 @@
           <button onclick="openModal('modalAddTool')" 
             class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-xs transition active:scale-95">
             <i class="fa-solid fa-plus text-xs"></i>
-            <span>+ Add Equipment</span>
+            <span>+ List Equipment</span>
           </button>
         </div>
       </div>
 
-      <!-- Equipment Cards Grid -->
-      <div id="equipmentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Equipment Grid -->
+      <div id="equipmentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Rendered dynamically -->
       </div>
-
-      <!-- Empty State -->
       <div id="equipmentEmpty" class="hidden text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
         <div class="w-12 h-12 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-2">🛠️</div>
-        <h3 class="text-sm font-bold text-slate-800">No equipment found</h3>
-        <p class="text-xs text-slate-500 mt-1">Try adjusting your search query or list a new item for your neighbors.</p>
+        <h3 class="text-sm font-bold text-slate-800">No equipment matches found</h3>
+        <p class="text-xs text-slate-500 mt-1">Try another search or list your own equipment for neighbors.</p>
       </div>
     </section>
 
+    <!-- ============================================================== -->
+    <!-- 2. FACILITIES & BOOKINGS                                       -->
+    <!-- ============================================================== -->
+    <section id="sectionFacilities" class="hidden space-y-6">
+      
+      <!-- Facility Banner & Filter -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Township Facilities & Spaces</h2>
+          <p class="text-xs text-slate-500">Book community halls, sports courts, and BBQ pavilions with instant confirmation.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select id="facilityTypeFilter" onchange="renderFacilities()"
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-600">
+            <option value="All">All Facilities</option>
+            <option value="Sports">🏸 Sports Courts</option>
+            <option value="Event">🏛️ Community Halls</option>
+            <option value="Recreation">🥩 BBQ & Pavilions</option>
+          </select>
+
+          <button onclick="viewMyBookings()" 
+            class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm border border-slate-200 transition">
+            <i class="fa-regular fa-calendar-check text-emerald-700 mr-1"></i> My Bookings
+          </button>
+        </div>
+      </div>
+
+      <!-- Facility Cards Grid -->
+      <div id="facilitiesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
 
     <!-- ============================================================== -->
-    <!-- SECTION 2: COMMUNITY ISSUES REPORTING                          -->
+    <!-- 3. SCHEDULED COMMUNITY EVENTS                                  -->
     <!-- ============================================================== -->
-    <section id="sectionIssues" class="hidden space-y-5">
+    <section id="sectionEvents" class="hidden space-y-6">
       
-      <!-- Top Action & Filter Bar -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Township Event Schedule</h2>
+          <p class="text-xs text-slate-500">Upcoming gotong-royong, health fogging alerts, cultural festivities, and recycling drives.</p>
+        </div>
+
+        <button onclick="openModal('modalProposeEvent')" 
+          class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-xs transition active:scale-95">
+          <i class="fa-solid fa-calendar-plus text-xs"></i>
+          <span>+ Propose Community Event</span>
+        </button>
+      </div>
+
+      <!-- Events List -->
+      <div id="eventsContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 4. COMMUNITY ISSUES & REPORTING (Public & Facility)            -->
+    <!-- ============================================================== -->
+    <section id="sectionIssues" class="hidden space-y-6">
+
+      <!-- Action & Search -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         
-        <!-- Search input -->
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
           <input type="text" id="issueSearchInput" oninput="renderIssues()" 
-            placeholder="Search issues by keyword, street name (e.g. Persiaran Seri Impian 1)..."
+            placeholder="Search issues across public roads or township facilities (e.g. Persiaran Seri Impian 1, Badminton Hall)..."
             class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-600 transition">
         </div>
 
-        <!-- Filters & Report Button -->
         <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-          <select id="issueCategoryFilter" onchange="renderIssues()" 
-            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-600">
-            <option value="All">All Categories</option>
-            <option value="Pothole & Roads">🕳️ Pothole & Roads</option>
-            <option value="Streetlights">💡 Streetlights</option>
-            <option value="Clogged Drain (Longkang)">🌊 Clogged Drain (Longkang)</option>
-            <option value="Damaged Playground">🛝 Damaged Playground</option>
-            <option value="Fallen Tree & Landscaping">🌳 Fallen Tree & Branches</option>
+          <select id="issueScopeFilter" onchange="renderIssues()"
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-rose-600">
+            <option value="All">All Scopes</option>
+            <option value="Public Infrastructure">🛣️ Public Infrastructure</option>
+            <option value="Township Facility">🏛️ Township Facility & Asset</option>
           </select>
 
           <select id="issueStatusFilter" onchange="renderIssues()" 
-            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-emerald-600">
+            class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-rose-600">
             <option value="All">All Status</option>
             <option value="Reported">Reported</option>
             <option value="In Progress">In Progress</option>
@@ -193,26 +316,159 @@
       <div id="issuesList" class="space-y-3">
         <!-- Rendered dynamically -->
       </div>
-
-      <!-- Empty State -->
       <div id="issuesEmpty" class="hidden text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
         <div class="w-12 h-12 mx-auto rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-2">🎉</div>
-        <h3 class="text-sm font-bold text-slate-800">No issues reported</h3>
-        <p class="text-xs text-slate-500 mt-1">There are no reports matching your filters.</p>
+        <h3 class="text-sm font-bold text-slate-800">No issues found</h3>
+        <p class="text-xs text-slate-500 mt-1">Everything looks smooth in our township.</p>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 5. MANAGEMENT FEE PAYMENT (DuitNow QR / FPX Online Banking)    -->
+    <!-- ============================================================== -->
+    <section id="sectionFees" class="hidden space-y-6">
+
+      <!-- Current Bill Header Card -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        
+        <!-- Outstanding / Current Bill Card -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-sm">
+                  💳
+                </span>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm">Monthly Maintenance & Sinking Fund</h3>
+                  <p class="text-xs text-slate-400">Township JMB / Residents Association Account</p>
+                </div>
+              </div>
+              <span id="currentBillStatusBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                ● Pending Payment
+              </span>
+            </div>
+
+            <!-- Unit Info & Breakdown -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4 bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+              <div>
+                <span class="text-slate-400 block text-[11px]">Registered Unit</span>
+                <span class="font-bold text-slate-800" id="feeUnitDisplay">No. 28, Jalan Harmoni 3/2</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[11px]">Billing Cycle</span>
+                <span class="font-bold text-slate-800">October 2026</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[11px]">Due Date</span>
+                <span class="font-bold text-rose-600">31 Oct 2026</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-xs text-slate-600">
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span>Security Patrol & 24/7 Guardhouse Operations</span>
+                <span class="font-semibold text-slate-800">RM 80.00</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span>Landscape & Common Monsoon Drain Upkeep</span>
+                <span class="font-semibold text-slate-800">RM 25.00</span>
+              </div>
+              <div class="flex justify-between py-1 border-b border-slate-100">
+                <span>Township Sinking Fund Reserve</span>
+                <span class="font-semibold text-slate-800">RM 15.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 mt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <span class="text-[11px] text-slate-400 block">Total Outstanding Amount</span>
+              <span class="text-2xl font-extrabold text-slate-900 tracking-tight" id="billAmountDisplay">RM 120.00</span>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button id="btnPayNow" onclick="openPaymentGateway()" 
+                class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-lock text-xs"></i>
+                <span>Pay Fee (RM 120.00)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Official Payment Guide Card -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-5 flex flex-col justify-between shadow-xs">
+          <div>
+            <div class="flex items-center gap-2 text-xs text-emerald-400 font-bold uppercase tracking-wider mb-2">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>Official Payment Portal</span>
+            </div>
+            <h4 class="font-bold text-sm text-white">Direct JMB Settlement</h4>
+            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+              Official maintenance payments are channeled straight to <strong>Persatuan Penduduk Bandar Harmoni</strong>. Instant official e-Receipt generated with reference serial number.
+            </p>
+
+            <div class="mt-4 space-y-2 text-xs">
+              <div class="flex items-center gap-2 bg-white/10 p-2.5 rounded-xl border border-white/10">
+                <span class="text-base">🇲🇾</span>
+                <div>
+                  <span class="font-bold block">DuitNow QR Instant</span>
+                  <span class="text-[10px] text-slate-300">Scan via Maybank MAE, TNG eWallet, CIMB, etc.</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 bg-white/10 p-2.5 rounded-xl border border-white/10">
+                <span class="text-base">🏛️</span>
+                <div>
+                  <span class="font-bold block">FPX Online Banking</span>
+                  <span class="text-[10px] text-slate-300">Supported by all Malaysian retail banks</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 text-[11px] text-slate-400 border-t border-white/10">
+            Enquiries: <strong>finance@bandarharmoni.com.my</strong>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Payment History & Past Receipts -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+        <h3 class="font-bold text-slate-900 text-sm mb-3">Billing & Payment History</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">Receipt No.</th>
+                <th class="py-2.5 px-3">Billing Month</th>
+                <th class="py-2.5 px-3">Amount</th>
+                <th class="py-2.5 px-3">Payment Method</th>
+                <th class="py-2.5 px-3">Date Paid</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="paymentHistoryBody" class="divide-y divide-slate-100">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
   </main>
 
   <!-- ============================================================== -->
-  <!-- MODAL 1: ADD EQUIPMENT                                         -->
+  <!-- MODAL: ADD EQUIPMENT                                           -->
   <!-- ============================================================== -->
   <div id="modalAddTool" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
       <div class="px-5 py-4 bg-emerald-800 text-white flex items-center justify-between">
         <div>
-          <h3 class="font-bold text-sm">Add Equipment to Share / Rent</h3>
-          <p class="text-emerald-100 text-[11px]">List your tools for neighbors in the township</p>
+          <h3 class="font-bold text-sm">List Equipment to Share / Rent</h3>
+          <p class="text-emerald-100 text-[11px]">Help neighbors maintain their homes</p>
         </div>
         <button onclick="closeModal('modalAddTool')" class="text-white/80 hover:text-white text-base">✕</button>
       </div>
@@ -220,7 +476,7 @@
       <form id="formAddTool" onsubmit="handleNewTool(event)" class="p-5 space-y-3.5 overflow-y-auto text-xs">
         <div>
           <label class="block font-bold text-slate-700 mb-1">Equipment Name *</label>
-          <input type="text" id="newToolName" required placeholder="e.g. Honda 4-Stroke Lawn Mower / Karcher K4 Pressure Washer"
+          <input type="text" id="newToolName" required placeholder="e.g. Kärcher K4 Pressure Washer / Cordless Grass Trimmer"
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
         </div>
 
@@ -235,7 +491,7 @@
             </select>
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Rate (RM / day) *</label>
+            <label class="block font-bold text-slate-700 mb-1">Daily Rate (RM) *</label>
             <input type="text" id="newToolPrice" required placeholder="e.g. RM 15 / day or Free"
               class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
           </div>
@@ -250,19 +506,19 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Owner Name *</label>
-            <input type="text" id="newToolOwner" required placeholder="e.g. Uncle Tan / En. Faizal"
+            <input type="text" id="newToolOwner" required placeholder="e.g. Uncle Wong / En. Faizal"
               class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Malaysian Mobile / WhatsApp *</label>
+            <label class="block font-bold text-slate-700 mb-1">WhatsApp Number *</label>
             <input type="tel" id="newToolPhone" required placeholder="+60 12-345 6789"
               class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Condition & Pickup Notes (Optional)</label>
-          <textarea id="newToolDesc" rows="2" placeholder="e.g. Includes safety goggles & extension wire. Please return clean."
+          <label class="block font-bold text-slate-700 mb-1">Instructions / Included Accessories</label>
+          <textarea id="newToolDesc" rows="2" placeholder="e.g. Comes with 10m heavy extension reel and nozzle set."
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none"></textarea>
         </div>
 
@@ -275,14 +531,149 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- MODAL 2: REPORT COMMUNITY ISSUE                                -->
+  <!-- MODAL: BOOK FACILITY                                           -->
+  <!-- ============================================================== -->
+  <div id="modalBookFacility" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+      <div class="px-5 py-4 bg-emerald-800 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm" id="bookFacilityTitle">Book Facility</h3>
+          <p class="text-emerald-100 text-[11px]" id="bookFacilityRateSubtitle">Rates and hours</p>
+        </div>
+        <button onclick="closeModal('modalBookFacility')" class="text-white/80 hover:text-white text-base">✕</button>
+      </div>
+
+      <form id="formBookFacility" onsubmit="handleFacilityBooking(event)" class="p-5 space-y-3.5 overflow-y-auto text-xs">
+        <input type="hidden" id="bookFacilityId">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Booking Date *</label>
+            <input type="date" id="bookFacilityDate" required 
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none bg-white">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Session / Slot *</label>
+            <select id="bookFacilitySlot" onchange="calculateFacilityPrice()" required 
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none bg-white">
+              <option value="morning">Morning (09:00 AM - 12:00 PM)</option>
+              <option value="afternoon">Afternoon (02:00 PM - 05:00 PM)</option>
+              <option value="evening">Evening / Night (06:00 PM - 10:00 PM)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Resident Full Name *</label>
+            <input type="text" id="bookFacilityResident" required placeholder="e.g. Raymond Tan"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Malaysian Mobile *</label>
+            <input type="tel" id="bookFacilityPhone" required placeholder="+60 12-345 6789"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Residential Street Address *</label>
+          <input type="text" id="bookFacilityAddress" required placeholder="e.g. No. 28, Jalan Harmoni 3/2, Precinct 4"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Purpose / Notes</label>
+          <input type="text" id="bookFacilityPurpose" placeholder="e.g. Family gathering, weekend badminton session, birthday BBQ"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+        </div>
+
+        <!-- Price Estimate Box -->
+        <div class="bg-emerald-50 rounded-xl p-3 border border-emerald-100 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] text-emerald-800 font-semibold block">Estimated Booking Total</span>
+            <span class="text-[10px] text-emerald-600">Standard refundable security deposit applies at guardhouse</span>
+          </div>
+          <span class="text-base font-extrabold text-emerald-800" id="bookFacilityEstimatedCost">RM 30.00</span>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modalBookFacility')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold">Confirm & Book</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: PROPOSE COMMUNITY EVENT                                 -->
+  <!-- ============================================================== -->
+  <div id="modalProposeEvent" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+      <div class="px-5 py-4 bg-emerald-800 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-sm">Schedule / Propose Event</h3>
+          <p class="text-emerald-100 text-[11px]">Community activities, sports days & safety alerts</p>
+        </div>
+        <button onclick="closeModal('modalProposeEvent')" class="text-white/80 hover:text-white text-base">✕</button>
+      </div>
+
+      <form id="formProposeEvent" onsubmit="handleProposeEvent(event)" class="p-5 space-y-3.5 overflow-y-auto text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Event Title *</label>
+          <input type="text" id="newEventTitle" required placeholder="e.g. Deepavali Potluck & Lantern Walk / E-Waste Recycle Drive"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Event Date *</label>
+            <input type="date" id="newEventDate" required 
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none bg-white">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Time *</label>
+            <input type="text" id="newEventTime" required placeholder="e.g. 08:30 AM - 11:30 AM"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Venue / Meeting Point *</label>
+            <input type="text" id="newEventVenue" required placeholder="e.g. Central Park & Dewan Komuniti"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Organizing Body</label>
+            <input type="text" id="newEventOrganizer" placeholder="e.g. Residents Association / Green Bureau"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Event Description & Resident Briefing *</label>
+          <textarea id="newEventDesc" rows="3" required placeholder="e.g. Please bring old gloves and empty recyclables. Halal refreshments will be provided."
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modalProposeEvent')" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold">Publish to Calendar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: REPORT COMMUNITY ISSUE (Public & Facilities)            -->
   <!-- ============================================================== -->
   <div id="modalAddIssue" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
       <div class="px-5 py-4 bg-rose-600 text-white flex items-center justify-between">
         <div>
           <h3 class="font-bold text-sm">Report Community Issue</h3>
-          <p class="text-rose-100 text-[11px]">Help maintain safety & hygiene in our township</p>
+          <p class="text-rose-100 text-[11px]">Report public infrastructure damage or facility defects</p>
         </div>
         <button onclick="closeModal('modalAddIssue')" class="text-white/80 hover:text-white text-base">✕</button>
       </div>
@@ -290,21 +681,28 @@
       <form id="formAddIssue" onsubmit="handleNewIssue(event)" class="p-5 space-y-3.5 overflow-y-auto text-xs">
         <div>
           <label class="block font-bold text-slate-700 mb-1">Issue Title *</label>
-          <input type="text" id="newIssueTitle" required placeholder="e.g. Hazardous Pothole / Streetlight #08 Faulty"
+          <input type="text" id="newIssueTitle" required placeholder="e.g. Dewan Aircond Leaking / Pothole near Roundabout"
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Category *</label>
-            <select id="newIssueCategory" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none bg-white">
-              <option value="Pothole & Roads">🕳️ Pothole & Roads</option>
-              <option value="Streetlights">💡 Streetlights</option>
-              <option value="Clogged Drain (Longkang)">🌊 Clogged Drain (Longkang)</option>
-              <option value="Damaged Playground">🛝 Damaged Playground</option>
-              <option value="Fallen Tree & Landscaping">🌳 Fallen Tree & Branches</option>
+            <label class="block font-bold text-slate-700 mb-1">Issue Scope *</label>
+            <select id="newIssueScope" onchange="syncCategoryOptions()" required 
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none bg-white">
+              <option value="Public Infrastructure">🛣️ Public Infrastructure</option>
+              <option value="Township Facility">🏛️ Township Facility & Asset</option>
             </select>
           </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Specific Category *</label>
+            <select id="newIssueCategory" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none bg-white">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Priority Level</label>
             <select id="newIssuePriority" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none bg-white">
@@ -312,17 +710,16 @@
               <option value="Urgent">⚠️ Urgent Hazard</option>
             </select>
           </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Specific Location / Landmark *</label>
+            <input type="text" id="newIssueLocation" required placeholder="e.g. Opposite house No. 42, Jalan Kasuarina 8 or Badminton Court 2"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none">
+          </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Street Address & Landmark *</label>
-          <input type="text" id="newIssueLocation" required placeholder="e.g. Opposite house No. 42, Jalan Kasuarina 8/KS07"
-            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Description of Problem *</label>
-          <textarea id="newIssueDesc" rows="3" required placeholder="e.g. The pothole is roughly 2 feet wide and fills with water after rain. Potential tyre puncture danger for cars and motorbikes."
+          <label class="block font-bold text-slate-700 mb-1">Description of Defect / Hazard *</label>
+          <textarea id="newIssueDesc" rows="3" required placeholder="Describe what is broken, size, hazard risk, or error code..."
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-rose-600 focus:outline-none"></textarea>
         </div>
 
@@ -335,34 +732,230 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- MODAL 3: QUICK RESERVE EQUIPMENT                               -->
+  <!-- MODAL: REPORT POWER BANK KIOSK FAULT                           -->
   <!-- ============================================================== -->
-  <div id="modalReserve" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+  <div id="modalReportKioskIssue" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden border border-slate-100 p-5 space-y-3">
       <div class="flex items-center justify-between pb-2 border-b border-slate-100">
         <div>
-          <h3 class="font-bold text-sm text-slate-900" id="resModalToolName">Reserve Equipment</h3>
-          <p class="text-slate-500 text-[11px]" id="resModalToolPrice"></p>
+          <h3 class="font-bold text-sm text-slate-900">Report Power Bank Kiosk</h3>
+          <p class="text-slate-500 text-[11px]">Notify technician of stuck slot or payment error</p>
         </div>
-        <button onclick="closeModal('modalReserve')" class="text-slate-400 hover:text-slate-600">✕</button>
+        <button onclick="closeModal('modalReportKioskIssue')" class="text-slate-400 hover:text-slate-600">✕</button>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Your Name *</label>
-          <input type="text" id="resBorrowerName" placeholder="e.g. Raymond Lee"
+          <label class="block font-bold text-slate-700 mb-1">Select Kiosk Location *</label>
+          <select id="kioskReportStation" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none bg-white">
+            <option value="Clubhouse Central Lobby">Clubhouse Central Lobby (Station #01)</option>
+            <option value="Guardhouse A (Main Boulevard)">Guardhouse A (Main Boulevard) (Station #02)</option>
+            <option value="Dewan Komuniti Multi-Hall">Dewan Komuniti Multi-Hall (Station #03)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Slot Number (Optional)</label>
+          <input type="text" id="kioskReportSlot" placeholder="e.g. Slot 4 or QR Scanner unreadable"
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Your Malaysian Address / House No. *</label>
-          <input type="text" id="resBorrowerAddress" placeholder="e.g. No. 15, Jalan Harmoni 3/4"
-            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none">
+          <label class="block font-bold text-slate-700 mb-1">Issue Description *</label>
+          <textarea id="kioskReportDesc" rows="2" placeholder="e.g. Power bank did not eject after scanning or returns not registering"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 focus:border-emerald-600 focus:outline-none"></textarea>
         </div>
       </div>
 
       <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-        <button onclick="closeModal('modalReserve')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
-        <button onclick="confirmReservation()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white">Confirm Booking</button>
+        <button onclick="closeModal('modalReportKioskIssue')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancel</button>
+        <button onclick="submitKioskIssue()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white">Send Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: PAYMENT GATEWAY (DuitNow QR / FPX Online Banking)       -->
+  <!-- ============================================================== -->
+  <div id="modalPaymentGateway" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-extrabold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+              FPX & DuitNow
+            </span>
+            <h3 class="font-bold text-sm">Secure Payment Gateway</h3>
+          </div>
+          <p class="text-slate-300 text-[11px] mt-0.5">Persatuan Penduduk Bandar Harmoni • JMB Sinking & Maintenance</p>
+        </div>
+        <button onclick="closeModal('modalPaymentGateway')" class="text-slate-400 hover:text-white text-base">✕</button>
+      </div>
+
+      <!-- Payment Body -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        
+        <!-- Total Pill -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] text-slate-500 block">Total Settlement</span>
+            <span class="font-extrabold text-slate-900 text-lg">RM 120.00</span>
+          </div>
+          <div class="text-right">
+            <span class="text-[11px] text-slate-500 block">Billing Period</span>
+            <span class="font-semibold text-slate-800">October 2026</span>
+          </div>
+        </div>
+
+        <!-- Payment Method Tabs -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Choose Payment Channel</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="payMethodDuitNow" onclick="selectPayMethod('duitnow')"
+              class="py-2.5 px-3 rounded-xl border-2 border-emerald-700 bg-emerald-50/50 text-emerald-800 font-bold flex flex-col items-center justify-center gap-1 transition">
+              <span class="text-sm">🇲🇾 DuitNow QR</span>
+              <span class="text-[10px] font-normal text-emerald-600">Scan via eWallet / Banking Apps</span>
+            </button>
+            <button type="button" id="payMethodFPX" onclick="selectPayMethod('fpx')"
+              class="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold flex flex-col items-center justify-center gap-1 transition hover:bg-slate-50">
+              <span class="text-sm">🏛️ FPX Banking</span>
+              <span class="text-[10px] font-normal text-slate-500">Maybank2u, CIMB, PBB, etc.</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- DuitNow Channel View -->
+        <div id="channelDuitNowView" class="space-y-3 text-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <span class="text-[11px] font-semibold text-slate-600 block">Scan this official Malaysian DuitNow QR code</span>
+          
+          <!-- Mock QR Display -->
+          <div class="w-44 h-44 mx-auto bg-white p-2.5 rounded-2xl border-2 border-dashed border-rose-300 shadow-xs flex flex-col items-center justify-center relative">
+            <div class="text-rose-600 font-black text-xs tracking-wider mb-1">DuitNow QR</div>
+            <div class="w-32 h-32 bg-slate-900 rounded-lg p-2 flex items-center justify-center">
+              <!-- Pixel Grid Representation of QR -->
+              <div class="grid grid-cols-5 gap-1 w-full h-full p-1 bg-white rounded">
+                <div class="bg-black rounded-xs"></div><div class="bg-black rounded-xs"></div><div class="bg-white"></div><div class="bg-black rounded-xs"></div><div class="bg-black rounded-xs"></div>
+                <div class="bg-black rounded-xs"></div><div class="bg-white"></div><div class="bg-black rounded-xs"></div><div class="bg-white"></div><div class="bg-black rounded-xs"></div>
+                <div class="bg-white"></div><div class="bg-black rounded-xs"></div><div class="bg-rose-600 rounded-full"></div><div class="bg-black rounded-xs"></div><div class="bg-white"></div>
+                <div class="bg-black rounded-xs"></div><div class="bg-white"></div><div class="bg-black rounded-xs"></div><div class="bg-white"></div><div class="bg-black rounded-xs"></div>
+                <div class="bg-black rounded-xs"></div><div class="bg-black rounded-xs"></div><div class="bg-white"></div><div class="bg-black rounded-xs"></div><div class="bg-black rounded-xs"></div>
+              </div>
+            </div>
+            <span class="text-[9px] text-slate-400 mt-1 font-mono">BANDAR-HARMONI-JMB</span>
+          </div>
+
+          <p class="text-[11px] text-slate-500">
+            Open your banking app (MAE, CIMB OCTO, TNG eWallet, Hong Leong Connect) and tap <strong>Scan QR</strong>.
+          </p>
+        </div>
+
+        <!-- FPX Channel View -->
+        <div id="channelFPXView" class="hidden space-y-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Select Bank</label>
+            <select id="fpxBankSelect" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-slate-800 font-semibold focus:border-emerald-600 focus:outline-none bg-white">
+              <option value="Maybank2u">Maybank (Maybank2u)</option>
+              <option value="CIMB Clicks">CIMB Bank (CIMB Clicks)</option>
+              <option value="Public Bank">Public Bank Online</option>
+              <option value="Hong Leong Connect">Hong Leong Bank</option>
+              <option value="RHB Now">RHB Bank</option>
+              <option value="Bank Islam">Bank Islam</option>
+              <option value="AmOnline">AmBank (AmOnline)</option>
+              <option value="Touch n Go eWallet">Touch 'n Go eWallet</option>
+            </select>
+          </div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-800">
+            <i class="fa-solid fa-circle-info mr-1"></i> You will be connected to your bank's secure authorization portal for B2C payment.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2">
+        <button onclick="closeModal('modalPaymentGateway')" class="px-4 py-2 rounded-xl text-slate-600 font-semibold hover:bg-slate-200">Cancel</button>
+        <button onclick="processSimulatedPayment()" class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold transition shadow-xs active:scale-95 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Confirm & Complete Payment</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: RECEIPT VIEW & PRINT                                    -->
+  <!-- ============================================================== -->
+  <div id="modalReceipt" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
+      
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
+        <h3 class="font-bold text-sm">Official e-Receipt</h3>
+        <button onclick="closeModal('modalReceipt')" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <!-- Printable area -->
+      <div id="receiptPrintArea" class="p-6 space-y-4 text-xs bg-white">
+        <div class="text-center pb-3 border-b border-dashed border-slate-300">
+          <div class="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold mb-1">
+            ✓
+          </div>
+          <h4 class="font-extrabold text-base text-slate-900">Payment Successful</h4>
+          <p class="text-[11px] text-slate-500">Persatuan Penduduk Bandar Harmoni (PPM-021-14-19022019)</p>
+        </div>
+
+        <div class="space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Receipt Ref:</span>
+            <span class="font-mono font-bold text-slate-800" id="recRefNumber">REC-MY-2026-8821</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Date & Time:</span>
+            <span class="font-semibold text-slate-800" id="recDateTime">14 Oct 2026, 08:35 AM</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Resident Address:</span>
+            <span class="font-semibold text-slate-800" id="recAddress">No. 28, Jalan Harmoni 3/2</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Payment Method:</span>
+            <span class="font-semibold text-slate-800" id="recMethod">DuitNow QR</span>
+          </div>
+          <div class="flex justify-between pt-1 border-t border-slate-200">
+            <span class="font-bold text-slate-700">Total Amount Paid:</span>
+            <span class="font-extrabold text-emerald-700 text-sm" id="recAmount">RM 120.00</span>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-400 text-center leading-relaxed">
+          This receipt is computer generated and verified by the Township JMB Financial Management Portal.
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs flex items-center gap-1.5">
+          <i class="fa-solid fa-print"></i> Print / Save PDF
+        </button>
+        <button onclick="closeModal('modalReceipt')" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs">
+          Done
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: MY BOOKINGS LIST                                        -->
+  <!-- ============================================================== -->
+  <div id="modalMyBookings" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
+      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <h3 class="font-bold text-sm">My Facility Bookings</h3>
+        <button onclick="closeModal('modalMyBookings')" class="text-white/80 hover:text-white">✕</button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-3 text-xs" id="myBookingsContainer">
+        <!-- Rendered dynamically -->
       </div>
     </div>
   </div>
@@ -376,7 +969,45 @@
   </div>
 
   <script>
-    // Authentic Malaysian Initial Data Store
+    // ==========================================
+    // INITIAL MOCK DATA WITH MALAYSIAN CONTEXT
+    // ==========================================
+    
+    // 1. Power Bank Kiosks
+    const DEFAULT_KIOSKS = [
+      {
+        id: 'kiosk-1',
+        location: 'Clubhouse Central Lobby',
+        address: 'Clubhouse Complex, Persiaran Harmoni 1',
+        available: 8,
+        total: 10,
+        rate: 'RM 1.00 / hour',
+        freeWindow: '30 mins free',
+        status: 'Operational'
+      },
+      {
+        id: 'kiosk-2',
+        location: 'Guardhouse A (Main Boulevard)',
+        address: 'Entrance Guardhouse, Jalan Harmoni Utama',
+        available: 6,
+        total: 10,
+        rate: 'RM 1.00 / hour',
+        freeWindow: '30 mins free',
+        status: 'Operational'
+      },
+      {
+        id: 'kiosk-3',
+        location: 'Dewan Komuniti Multi-Hall',
+        address: 'Dewan Komuniti, Jalan Melati 2, Precinct 2',
+        available: 9,
+        total: 12,
+        rate: 'RM 1.00 / hour',
+        freeWindow: '30 mins free',
+        status: 'Operational'
+      }
+    ];
+
+    // 2. Equipment
     const DEFAULT_TOOLS = [
       {
         id: 'tool-1',
@@ -387,7 +1018,7 @@
         street: 'No. 28, Jalan Harmoni 3/2, Precinct 4',
         owner: 'Uncle Wong',
         phone: '+60 12-345 6789',
-        desc: 'Includes fresh fuel & grass catcher bag. Suitable for corner lot lawns.',
+        desc: 'Includes fresh fuel & grass catcher bag. Great for corner lot garden upkeep.',
         status: 'Available',
         reservedBy: null
       },
@@ -400,13 +1031,13 @@
         street: 'No. 5, Persiaran Seri Impian 1',
         owner: 'En. Faizal',
         phone: '+60 19-876 5432',
-        desc: 'Includes 10m high-pressure hose and dirt blaster nozzle for driveway moss.',
+        desc: 'Includes 10m high-pressure hose and dirt blaster nozzle for mossy driveways.',
         status: 'Available',
         reservedBy: null
       },
       {
         id: 'tool-3',
-        name: '12-Step Heavy Duty Telescopic Aluminum Ladder',
+        name: '12-Step Telescopic Aluminum Ladder',
         category: 'Gardening & Lawn',
         icon: 'fa-stairs',
         price: 'Free',
@@ -414,8 +1045,8 @@
         owner: 'Mr. David Tan',
         phone: '+60 16-222 3344',
         desc: 'Safely reaches roof gutters, awning lights, and high tree trimming.',
-        status: 'Reserved',
-        reservedBy: 'Hafiz (Jalan Melati 5/1)'
+        status: 'Available',
+        reservedBy: null
       },
       {
         id: 'tool-4',
@@ -432,100 +1063,346 @@
       }
     ];
 
+    // 3. Township Facilities
+    const DEFAULT_FACILITIES = [
+      {
+        id: 'fac-1',
+        name: 'Dewan Komuniti Multi-Purpose Hall',
+        type: 'Event',
+        location: 'Clubhouse Zone, Persiaran Harmoni 1',
+        ratePerHour: 50,
+        rateDisplay: 'RM 50 / hour',
+        capacity: '150 - 200 Pax',
+        amenities: ['Central Air-Conditioning', 'Audio PA System & Mic', 'Surau Access', 'Stage Lighting'],
+        icon: 'fa-landmark'
+      },
+      {
+        id: 'fac-2',
+        name: 'Indoor Badminton Courts (Court 1 & 2)',
+        type: 'Sports',
+        location: 'Sports Arena, Jalan Harmoni 2/4',
+        ratePerHour: 10,
+        rateDisplay: 'RM 10 / hour',
+        capacity: 'Up to 8 Players',
+        amenities: ['Tournament Grade Rubber Flooring', 'High-Bay LED Floodlights', 'Water Dispenser'],
+        icon: 'fa-volleyball'
+      },
+      {
+        id: 'fac-3',
+        name: 'Lakeside BBQ Pavilion (Pit 1 & 2)',
+        type: 'Recreation',
+        location: 'Central Lake Park, Persiaran Harmoni Utama',
+        ratePerHour: 30,
+        rateDisplay: 'RM 30 / 3-hour Slot',
+        capacity: '15 - 25 Pax',
+        amenities: ['Double Stainless Steel Grills', 'Prep Sink & Tap Water', 'Covered Gazebo Seating', 'Waste Bins'],
+        icon: 'fa-fire-burner'
+      },
+      {
+        id: 'fac-4',
+        name: 'Township Synthetic Tennis Court',
+        type: 'Sports',
+        location: 'Sports Arena, Jalan Harmoni 2/4',
+        ratePerHour: 15,
+        rateDisplay: 'RM 15 / hour',
+        capacity: '4 Players',
+        amenities: ['Night Floodlights (Automated token)', 'Perimeter Windbreak Netting', 'Benches'],
+        icon: 'fa-table-tennis-paddle-ball'
+      }
+    ];
+
+    // 4. Community Events
+    const DEFAULT_EVENTS = [
+      {
+        id: 'ev-1',
+        title: 'Township Gotong-Royong Clean-Up & Tree Planting',
+        date: '2026-10-24',
+        dateDisplay: 'Sat, 24 Oct 2026',
+        time: '08:00 AM - 11:30 AM',
+        venue: 'Central Lake Park & Perimeter Drains',
+        organizer: 'Residents Association & Health Bureau',
+        desc: 'Gotong-royong to clear dried leaves, plant 50 bougainvillea saplings, and clean longkang drains to prevent dengue. Free breakfast provided.',
+        badge: 'Environment & Gotong-Royong',
+        attendees: 42,
+        userRSVP: false
+      },
+      {
+        id: 'ev-2',
+        title: 'Township Dengue Prevention Fogging Notice',
+        date: '2026-10-18',
+        dateDisplay: 'Sun, 18 Oct 2026',
+        time: '05:30 PM - 07:00 PM',
+        venue: 'Precinct 2, 3 & 4 (All residential roads)',
+        organizer: 'Pejabat Kesihatan Daerah & JMB',
+        desc: 'Thermal chemical fogging scheduled across Jalan Harmoni 2, Jalan Harmoni 3, and Lorong Melati. Please shut windows and keep pets indoors.',
+        badge: 'Health & Safety Notice',
+        attendees: 19,
+        userRSVP: true
+      },
+      {
+        id: 'ev-3',
+        title: 'Deepavali Community Gathering & Lantern Walk',
+        date: '2026-11-01',
+        dateDisplay: 'Sun, 01 Nov 2026',
+        time: '07:30 PM - 10:00 PM',
+        venue: 'Dewan Komuniti Multi-Hall',
+        organizer: 'Harmony Cultural Committee',
+        desc: 'Potluck dinner, festive murukku tasting, Indian cultural performances, and kids lantern walk around the illuminated central park boulevard.',
+        badge: 'Cultural Celebration',
+        attendees: 68,
+        userRSVP: false
+      }
+    ];
+
+    // 5. Community Issues (Public Infrastructure & Facilities)
     const DEFAULT_ISSUES = [
       {
         id: 'iss-1',
         title: 'Deep Cavity Pothole near Roundabout',
+        scope: 'Public Infrastructure',
         category: 'Pothole & Roads',
         priority: 'Urgent',
         location: 'In front of No. 24, Jalan Harmoni 3/2, Precinct 4',
         desc: 'Roughly 1.5 ft wide pothole. Danger for motorbikes and cyclists especially during heavy downpours.',
         date: '12 Oct 2026',
-        upvotes: 19,
+        upvotes: 21,
         hasUpvoted: false,
         status: 'In Progress'
       },
       {
         id: 'iss-2',
-        title: 'Streetlight Pole #TL-14 Light Blackout',
-        category: 'Streetlights',
+        title: 'Dewan Komuniti Aircond Unit #3 Leaking Water',
+        scope: 'Township Facility',
+        category: 'Community Hall Defect',
         priority: 'Normal',
-        location: 'Cross junction of Jalan Meranti 4 & Lorong 4/B',
-        desc: 'Bulb flickered for days and is now completely dark at night, affecting intersection visibility.',
-        date: '10 Oct 2026',
-        upvotes: 14,
+        location: 'Dewan Komuniti, Jalan Melati 2',
+        desc: 'Air conditioner cassette unit above the main stage is dripping condensate water onto the wooden floor.',
+        date: '11 Oct 2026',
+        upvotes: 9,
         hasUpvoted: false,
         status: 'Reported'
       },
       {
         id: 'iss-3',
         title: 'Clogged Perimeter Monsoon Drain (Longkang)',
+        scope: 'Public Infrastructure',
         category: 'Clogged Drain (Longkang)',
         priority: 'Urgent',
         location: 'Beside Surau Al-Hidayah, Persiaran Seri Impian 1',
         desc: 'Accumulated dead tree branches and silt obstructing water outlet. Stagnant water posing Aedes mosquito hazard.',
         date: '08 Oct 2026',
-        upvotes: 27,
+        upvotes: 34,
         hasUpvoted: true,
         status: 'Reported'
       },
       {
         id: 'iss-4',
-        title: 'Broken Kids Swing Chain & Safety Hook',
-        category: 'Damaged Playground',
+        title: 'Badminton Court 1 Net Torn and Slack',
+        scope: 'Township Facility',
+        category: 'Sports Court Defect',
         priority: 'Normal',
-        location: 'Central Playground, Jalan Tasik Utama 2',
-        desc: 'Right swing suspension link snapped. Needs replacement link to prevent child injury.',
-        date: '05 Oct 2026',
-        upvotes: 8,
+        location: 'Sports Arena, Jalan Harmoni 2/4',
+        desc: 'Center tension cord snapped. Needs replacement badminton net before evening resident sessions.',
+        date: '06 Oct 2026',
+        upvotes: 6,
         hasUpvoted: false,
         status: 'Resolved'
       }
     ];
 
-    // State initialization with LocalStorage
-    let tools = JSON.parse(localStorage.getItem('my_township_tools')) || DEFAULT_TOOLS;
-    let issues = JSON.parse(localStorage.getItem('my_township_issues')) || DEFAULT_ISSUES;
-    
-    // Migrate legacy "Open" statuses to "Reported"
-    issues = issues.map(iss => {
-      if (iss.status === 'Open') {
-        return { ...iss, status: 'Reported' };
+    // 6. Past Billing History
+    const DEFAULT_PAYMENTS = [
+      {
+        receiptNo: 'REC-MY-2026-7712',
+        period: 'September 2026',
+        amount: 'RM 120.00',
+        method: 'FPX (Maybank2u)',
+        date: '05 Sep 2026, 09:12 AM',
+        status: 'Paid'
+      },
+      {
+        receiptNo: 'REC-MY-2026-6204',
+        period: 'August 2026',
+        amount: 'RM 120.00',
+        method: 'DuitNow QR',
+        date: '02 Aug 2026, 03:45 PM',
+        status: 'Paid'
       }
-      return iss;
-    });
-    let currentResToolId = null;
+    ];
 
-    function saveState() {
+    // ==========================================
+    // LOCAL STORAGE SYNCHRONIZATION
+    // ==========================================
+    let kiosks = JSON.parse(localStorage.getItem('my_township_kiosks')) || DEFAULT_KIOSKS;
+    let tools = JSON.parse(localStorage.getItem('my_township_tools')) || DEFAULT_TOOLS;
+    let facilities = JSON.parse(localStorage.getItem('my_township_facilities')) || DEFAULT_FACILITIES;
+    let events = JSON.parse(localStorage.getItem('my_township_events')) || DEFAULT_EVENTS;
+    let issues = JSON.parse(localStorage.getItem('my_township_issues')) || DEFAULT_ISSUES;
+    let payments = JSON.parse(localStorage.getItem('my_township_payments')) || DEFAULT_PAYMENTS;
+    let facilityBookings = JSON.parse(localStorage.getItem('my_township_fac_bookings')) || [];
+
+    // Current Bill Status for October 2026
+    let currentBillPaid = localStorage.getItem('my_township_oct_paid') === 'true';
+    let currentUnit = localStorage.getItem('my_township_unit') || 'No. 28, Jalan Harmoni 3/2';
+    let activePayMethod = 'duitnow';
+
+    function saveAllState() {
+      localStorage.setItem('my_township_kiosks', JSON.stringify(kiosks));
       localStorage.setItem('my_township_tools', JSON.stringify(tools));
+      localStorage.setItem('my_township_facilities', JSON.stringify(facilities));
+      localStorage.setItem('my_township_events', JSON.stringify(events));
       localStorage.setItem('my_township_issues', JSON.stringify(issues));
-      updateBadgeCounts();
+      localStorage.setItem('my_township_payments', JSON.stringify(payments));
+      localStorage.setItem('my_township_fac_bookings', JSON.stringify(facilityBookings));
+      localStorage.setItem('my_township_oct_paid', currentBillPaid ? 'true' : 'false');
+      localStorage.setItem('my_township_unit', currentUnit);
+      updateHeaderBadges();
     }
 
-    function updateBadgeCounts() {
-      document.getElementById('toolsBadgeCount').textContent = tools.length;
-      document.getElementById('issuesBadgeCount').textContent = issues.length;
+    function updateHeaderBadges() {
+      document.getElementById('badgeTools').textContent = tools.length;
+      document.getElementById('badgeFacilities').textContent = facilities.length;
+      document.getElementById('badgeEvents').textContent = events.length;
+      document.getElementById('badgeIssues').textContent = issues.length;
+      
+      const feeBadge = document.getElementById('badgeFeeDue');
+      if (currentBillPaid) {
+        feeBadge.textContent = 'Paid';
+        feeBadge.className = 'text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold';
+      } else {
+        feeBadge.textContent = 'Due';
+        feeBadge.className = 'text-[10px] px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 font-bold';
+      }
+      
+      document.getElementById('currentResidentUnit').textContent = currentUnit;
+      document.getElementById('feeUnitDisplay').textContent = currentUnit;
     }
 
-    function switchTab(tab) {
-      const tabTools = document.getElementById('tabBtnTools');
-      const tabIssues = document.getElementById('tabBtnIssues');
-      const secTools = document.getElementById('sectionTools');
-      const secIssues = document.getElementById('sectionIssues');
+    function changeResidentUnit() {
+      const newAddress = prompt('Enter your Malaysian street address / Unit No:', currentUnit);
+      if (newAddress && newAddress.trim().length > 3) {
+        currentUnit = newAddress.trim();
+        saveAllState();
+        showToast(`Unit changed to ${currentUnit}`);
+      }
+    }
+
+    // ==========================================
+    // TAB SWITCHING
+    // ==========================================
+    function switchNavTab(tab) {
+      const tabs = ['tools', 'facilities', 'events', 'issues', 'fees'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`navTab${capitalize(t)}`);
+        const sec = document.getElementById(`section${capitalize(t)}`);
+        if (t === tab) {
+          btn.className = 'nav-tab-active px-3 py-1.5 rounded-xl whitespace-nowrap transition-all flex items-center gap-2';
+          sec.classList.remove('hidden');
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition-all flex items-center gap-2';
+          sec.classList.add('hidden');
+        }
+      });
 
       if (tab === 'tools') {
-        tabTools.className = "tab-active px-3.5 sm:px-4 py-1.5 rounded-lg transition-all flex items-center gap-2";
-        tabIssues.className = "px-3.5 sm:px-4 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-2";
-        secTools.classList.remove('hidden');
-        secIssues.classList.add('hidden');
+        renderKiosks();
         renderEquipment();
-      } else {
-        tabIssues.className = "tab-active px-3.5 sm:px-4 py-1.5 rounded-lg transition-all flex items-center gap-2 text-rose-700";
-        tabTools.className = "px-3.5 sm:px-4 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-2";
-        secIssues.classList.remove('hidden');
-        secTools.classList.add('hidden');
+      } else if (tab === 'facilities') {
+        renderFacilities();
+      } else if (tab === 'events') {
+        renderEvents();
+      } else if (tab === 'issues') {
         renderIssues();
+      } else if (tab === 'fees') {
+        renderBillingSection();
       }
+    }
+
+    // ==========================================
+    // RENDER: POWER BANK KIOSKS & EQUIPMENT
+    // ==========================================
+    function renderKiosks() {
+      const container = document.getElementById('kioskStationGrid');
+      container.innerHTML = kiosks.map(k => {
+        const pct = Math.round((k.available / k.total) * 100);
+        return `
+          <div class="bg-white/10 rounded-xl p-3.5 border border-white/10 backdrop-blur-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="font-bold text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-bolt text-amber-300"></i> ${escapeHTML(k.location)}
+                </span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 font-bold border border-emerald-400/30">
+                  ${k.status}
+                </span>
+              </div>
+              <p class="text-[11px] text-emerald-100/80 mb-2 truncate">${escapeHTML(k.address)}</p>
+
+              <div class="space-y-1 mb-2">
+                <div class="flex justify-between text-[11px] text-emerald-100">
+                  <span>Available Packs:</span>
+                  <span class="font-bold text-white">${k.available} / ${k.total} units</span>
+                </div>
+                <div class="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-emerald-400 h-full rounded-full" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-emerald-200">
+              <span>${k.rate}</span>
+              <button onclick="handleRentPowerBank('${k.id}')" 
+                class="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold text-[10px] transition active:scale-95 shadow-xs">
+                Borrow Now
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleRentPowerBank(id) {
+      const k = kiosks.find(item => item.id === id);
+      if (!k) return;
+      if (k.available <= 0) {
+        showToast('Sorry, all battery packs at this station are currently in use.', true);
+        return;
+      }
+      k.available -= 1;
+      saveAllState();
+      renderKiosks();
+      showToast(`Power Bank unlocked from Slot #0${k.total - k.available} at ${k.location}! First 30 mins free.`);
+    }
+
+    function submitKioskIssue() {
+      const station = document.getElementById('kioskReportStation').value;
+      const slot = document.getElementById('kioskReportSlot').value.trim() || 'General Slot';
+      const desc = document.getElementById('kioskReportDesc').value.trim();
+
+      if (!desc) {
+        showToast('Please describe the problem.', true);
+        return;
+      }
+
+      issues.unshift({
+        id: 'iss-' + Date.now(),
+        title: `Power Bank Kiosk Error (${slot})`,
+        scope: 'Township Facility',
+        category: 'Power Bank Kiosk Slot Error',
+        priority: 'Normal',
+        location: station,
+        desc: desc,
+        date: getTodayFormatted(),
+        upvotes: 1,
+        hasUpvoted: true,
+        status: 'Reported'
+      });
+
+      saveAllState();
+      closeModal('modalReportKioskIssue');
+      document.getElementById('kioskReportDesc').value = '';
+      document.getElementById('kioskReportSlot').value = '';
+      showToast('Kiosk error logged and dispatched to maintenance!');
     }
 
     function renderEquipment() {
@@ -554,174 +1431,70 @@
       grid.innerHTML = filtered.map(t => {
         const isAvail = t.status === 'Available';
         const cleanPhone = t.phone.replace(/[^0-9]/g, '');
-        const waText = encodeURIComponent(`Hi ${t.owner}, I am your neighbor from the township. I would like to check if your "${t.name}" is available to borrow/rent. Thank you!`);
+        const waText = encodeURIComponent(`Hi ${t.owner}, I am your neighbor from ${currentUnit}. I would like to check if your "${t.name}" is available to borrow/rent. Thank you!`);
         const waLink = `https://wa.me/${cleanPhone}?text=${waText}`;
 
         return `
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between hover:border-slate-300 transition group">
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col justify-between hover:border-slate-300 transition group">
             <div>
-              <!-- Top tags & price -->
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
+              <div class="flex items-center justify-between gap-2 mb-2.5">
+                <span class="text-xs font-extrabold px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
                   ${escapeHTML(t.price)}
                 </span>
-                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
                   isAvail ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'
                 }">
                   ${isAvail ? '● Available' : '○ Reserved'}
                 </span>
               </div>
 
-              <!-- Item Title & category -->
-              <div class="flex items-start gap-2.5 mb-2">
+              <div class="flex items-start gap-2 mb-2">
                 <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700 shrink-0 mt-0.5 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition">
                   <i class="fa-solid ${t.icon || 'fa-toolbox'} text-sm"></i>
                 </div>
                 <div>
-                  <h3 class="font-bold text-slate-900 text-sm leading-snug">${escapeHTML(t.name)}</h3>
-                  <span class="text-[11px] font-medium text-slate-400">${escapeHTML(t.category)}</span>
+                  <h3 class="font-bold text-slate-900 text-xs sm:text-sm leading-snug">${escapeHTML(t.name)}</h3>
+                  <span class="text-[10px] font-medium text-slate-400">${escapeHTML(t.category)}</span>
                 </div>
               </div>
 
-              <p class="text-xs text-slate-500 mb-4 line-clamp-2">${escapeHTML(t.desc)}</p>
+              <p class="text-xs text-slate-500 mb-3 line-clamp-2">${escapeHTML(t.desc)}</p>
 
-              <!-- Address and owner details in Malaysian format -->
-              <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 text-xs space-y-1 mb-4">
-                <div class="flex items-center text-slate-600 gap-1.5">
-                  <i class="fa-solid fa-location-dot text-emerald-600 text-[11px]"></i>
-                  <span class="font-medium truncate">${escapeHTML(t.street)}</span>
+              <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 text-[11px] space-y-1 mb-3">
+                <div class="flex items-center text-slate-600 gap-1.5 truncate">
+                  <i class="fa-solid fa-location-dot text-emerald-600 text-[10px]"></i>
+                  <span class="truncate">${escapeHTML(t.street)}</span>
                 </div>
-                <div class="flex items-center justify-between text-slate-500 pt-0.5 text-[11px]">
+                <div class="flex items-center justify-between text-slate-500 text-[10px]">
                   <span>Owner: <strong class="text-slate-700">${escapeHTML(t.owner)}</strong></span>
                   <span>${escapeHTML(t.phone)}</span>
                 </div>
                 ${t.reservedBy ? `
-                  <div class="pt-1 text-[11px] text-amber-700 font-semibold border-t border-slate-200/60">
+                  <div class="pt-1 text-[10px] text-amber-700 font-semibold border-t border-slate-200">
                     Reserved by: ${escapeHTML(t.reservedBy)}
                   </div>
                 ` : ''}
               </div>
             </div>
 
-            <!-- Action buttons -->
-            <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
+            <div class="pt-2 border-t border-slate-100 flex items-center gap-1.5">
               <a href="${waLink}" target="_blank" rel="noopener noreferrer" 
-                class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition shadow-xs">
+                class="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl text-xs font-bold bg-[#25D366] hover:bg-[#20bd5a] text-white transition shadow-xs">
                 <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
               </a>
 
               ${isAvail ? `
-                <button onclick="openReserveModal('${t.id}')" 
-                  class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white transition shadow-xs active:scale-95">
+                <button onclick="quickReserveTool('${t.id}')" 
+                  class="flex-1 py-1.5 px-2 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white transition shadow-xs active:scale-95">
                   Reserve
                 </button>
               ` : `
                 <button onclick="toggleReturnTool('${t.id}')" 
-                  class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-700 transition">
-                  Mark Available
+                  class="flex-1 py-1.5 px-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-700 transition">
+                  Mark Free
                 </button>
               `}
             </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderIssues() {
-      const list = document.getElementById('issuesList');
-      const empty = document.getElementById('issuesEmpty');
-      const query = (document.getElementById('issueSearchInput')?.value || '').toLowerCase().trim();
-      const category = document.getElementById('issueCategoryFilter')?.value || 'All';
-      const status = document.getElementById('issueStatusFilter')?.value || 'All';
-
-      const filtered = issues.filter(item => {
-        const matchesQuery = !query || 
-          item.title.toLowerCase().includes(query) || 
-          item.location.toLowerCase().includes(query) || 
-          item.desc.toLowerCase().includes(query);
-        const matchesCategory = (category === 'All' || item.category === category);
-        const matchesStatus = (status === 'All' || item.status === status);
-        return matchesQuery && matchesCategory && matchesStatus;
-      });
-
-      if (filtered.length === 0) {
-        list.innerHTML = '';
-        empty.classList.remove('hidden');
-        return;
-      }
-      empty.classList.add('hidden');
-
-      list.innerHTML = filtered.map(item => {
-        let statusBadge = 'bg-amber-100 text-amber-800 border-amber-200';
-        let statusTitle = 'Report received, awaiting review or contractor assignment';
-
-        if (item.status === 'In Progress') {
-          statusBadge = 'bg-blue-100 text-blue-800 border-blue-200';
-          statusTitle = 'Contractor or maintenance team is actively resolving this';
-        } else if (item.status === 'Resolved') {
-          statusBadge = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-          statusTitle = 'Issue has been inspected and resolved';
-        }
-
-        const isUrgent = item.priority === 'Urgent';
-
-        return `
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start justify-between gap-4 hover:border-slate-300 transition">
-            
-            <!-- Left: Upvote button -->
-            <button onclick="toggleIssueUpvote('${item.id}')" 
-              class="flex sm:flex-col items-center justify-center gap-1.5 px-3 py-2 sm:w-14 rounded-xl border text-xs transition shrink-0 ${
-                item.hasUpvoted 
-                  ? 'bg-rose-50 border-rose-300 text-rose-700 font-extrabold shadow-xs' 
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
-              }">
-              <i class="fa-solid fa-arrow-up text-xs"></i>
-              <span class="text-xs">${item.upvotes}</span>
-              <span class="text-[10px] hidden sm:block ${item.hasUpvoted ? 'text-rose-600' : 'text-slate-400'}">Upvote</span>
-            </button>
-
-            <!-- Middle: Main details -->
-            <div class="flex-1 space-y-1.5 w-full">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-md">
-                  ${escapeHTML(item.category)}
-                </span>
-                ${isUrgent ? `
-                  <span class="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
-                    ⚠️ Urgent
-                  </span>
-                ` : ''}
-                <span class="text-[11px] text-slate-400">Reported on ${item.date}</span>
-              </div>
-
-              <h3 class="font-bold text-slate-900 text-sm sm:text-base">${escapeHTML(item.title)}</h3>
-              
-              <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-                <i class="fa-solid fa-location-dot text-rose-600 text-[11px]"></i>
-                <span>${escapeHTML(item.location)}</span>
-              </div>
-
-              <p class="text-xs text-slate-500 pt-1 leading-relaxed">${escapeHTML(item.desc)}</p>
-            </div>
-
-            <!-- Right: Status badge & management dropdown -->
-            <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-              <span class="text-xs font-bold px-3 py-1 rounded-lg border ${statusBadge}" title="${statusTitle}">
-                ● ${item.status}
-              </span>
-
-              <!-- Status Switcher for Residents / Committee -->
-              <div class="flex items-center gap-1.5 text-xs">
-                <span class="text-[11px] text-slate-400">Update:</span>
-                <select onchange="updateIssueStatus('${item.id}', this.value)" 
-                  class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1 font-semibold focus:outline-none focus:border-emerald-600">
-                  <option value="Reported" ${item.status === 'Reported' ? 'selected' : ''}>Reported</option>
-                  <option value="In Progress" ${item.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                  <option value="Resolved" ${item.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
-                </select>
-              </div>
-            </div>
-
           </div>
         `;
       }).join('');
@@ -734,10 +1507,9 @@
       const price = document.getElementById('newToolPrice').value.trim();
       const street = document.getElementById('newToolStreet').value.trim();
       const owner = document.getElementById('newToolOwner').value.trim();
-      let phone = document.getElementById('newToolPhone').value.trim();
+      const phone = document.getElementById('newToolPhone').value.trim();
       const desc = document.getElementById('newToolDesc').value.trim();
 
-      // Icon determination
       let icon = 'fa-toolbox';
       if (category === 'Gardening & Lawn') icon = 'fa-seedling';
       if (category === 'Cleaning') icon = 'fa-shower';
@@ -758,74 +1530,21 @@
         reservedBy: null
       });
 
-      saveState();
+      saveAllState();
       renderEquipment();
       closeModal('modalAddTool');
       document.getElementById('formAddTool').reset();
-      showToast('Equipment listed successfully!');
+      showToast('Equipment listed on board!');
     }
 
-    function handleNewIssue(e) {
-      e.preventDefault();
-      const title = document.getElementById('newIssueTitle').value.trim();
-      const category = document.getElementById('newIssueCategory').value;
-      const priority = document.getElementById('newIssuePriority').value;
-      const location = document.getElementById('newIssueLocation').value.trim();
-      const desc = document.getElementById('newIssueDesc').value.trim();
-
-      const today = new Date();
-      const formattedDate = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-
-      issues.unshift({
-        id: 'iss-' + Date.now(),
-        title,
-        category,
-        priority,
-        location,
-        desc,
-        date: formattedDate,
-        upvotes: 1,
-        hasUpvoted: true,
-        status: 'Reported'
-      });
-
-      saveState();
-      renderIssues();
-      closeModal('modalAddIssue');
-      document.getElementById('formAddIssue').reset();
-      showToast('Issue reported to community board!');
-    }
-
-    // Reservation flow
-    function openReserveModal(id) {
+    function quickReserveTool(id) {
       const tool = tools.find(t => t.id === id);
       if (!tool) return;
-      currentResToolId = id;
-      document.getElementById('resModalToolName').textContent = tool.name;
-      document.getElementById('resModalToolPrice').textContent = `${tool.price} • Owner: ${tool.owner}`;
-      openModal('modalReserve');
-    }
-
-    function confirmReservation() {
-      const borrower = document.getElementById('resBorrowerName').value.trim();
-      const address = document.getElementById('resBorrowerAddress').value.trim();
-
-      if (!borrower || !address) {
-        showToast('Please provide your name and address.', true);
-        return;
-      }
-
-      const tool = tools.find(t => t.id === currentResToolId);
-      if (tool) {
-        tool.status = 'Reserved';
-        tool.reservedBy = `${borrower} (${address})`;
-        saveState();
-        renderEquipment();
-        closeModal('modalReserve');
-        document.getElementById('resBorrowerName').value = '';
-        document.getElementById('resBorrowerAddress').value = '';
-        showToast(`Equipment reserved for ${borrower}!`);
-      }
+      tool.status = 'Reserved';
+      tool.reservedBy = `${currentUnit}`;
+      saveAllState();
+      renderEquipment();
+      showToast(`Reserved ${tool.name} for ${currentUnit}!`);
     }
 
     function toggleReturnTool(id) {
@@ -833,13 +1552,410 @@
       if (tool) {
         tool.status = 'Available';
         tool.reservedBy = null;
-        saveState();
+        saveAllState();
         renderEquipment();
-        showToast('Equipment marked as Available.');
+        showToast('Equipment returned to Available status.');
       }
     }
 
-    // Upvote toggle
+    // ==========================================
+    // RENDER: FACILITIES & BOOKING
+    // ==========================================
+    function renderFacilities() {
+      const grid = document.getElementById('facilitiesGrid');
+      const filter = document.getElementById('facilityTypeFilter').value;
+
+      const filtered = facilities.filter(f => filter === 'All' || f.type === filter);
+
+      grid.innerHTML = filtered.map(f => {
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
+            <div class="p-5">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  ${f.rateDisplay}
+                </span>
+                <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
+                  <i class="fa-solid fa-users text-[10px] mr-1"></i> ${f.capacity}
+                </span>
+              </div>
+
+              <div class="flex items-start gap-3 mb-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100/60 text-emerald-800 flex items-center justify-center shrink-0">
+                  <i class="fa-solid ${f.icon} text-base"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm leading-snug">${escapeHTML(f.name)}</h3>
+                  <p class="text-xs text-slate-400 mt-0.5">${escapeHTML(f.location)}</p>
+                </div>
+              </div>
+
+              <!-- Amenity Badges -->
+              <div class="pt-3 border-t border-slate-100 mt-3 space-y-1.5">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Amenities Included:</span>
+                <div class="flex flex-wrap gap-1.5">
+                  ${f.amenities.map(a => `
+                    <span class="text-[11px] bg-slate-50 border border-slate-200 text-slate-600 px-2 py-0.5 rounded-md">
+                      ✓ ${escapeHTML(a)}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+              <div class="text-[11px] text-slate-500">
+                <span>Managed by JMB</span>
+              </div>
+              <button onclick="openFacilityBookingModal('${f.id}')" 
+                class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition active:scale-95 flex items-center gap-1.5">
+                <i class="fa-regular fa-calendar-check text-xs"></i>
+                <span>Book Facility</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openFacilityBookingModal(id) {
+      const fac = facilities.find(f => f.id === id);
+      if (!fac) return;
+
+      document.getElementById('bookFacilityId').value = fac.id;
+      document.getElementById('bookFacilityTitle').textContent = `Book ${fac.name}`;
+      document.getElementById('bookFacilityRateSubtitle').textContent = `${fac.rateDisplay} • Location: ${fac.location}`;
+      document.getElementById('bookFacilityAddress').value = currentUnit;
+
+      // Set min date to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('bookFacilityDate').value = today;
+      document.getElementById('bookFacilityDate').min = today;
+
+      calculateFacilityPrice();
+      openModal('modalBookFacility');
+    }
+
+    function calculateFacilityPrice() {
+      const facId = document.getElementById('bookFacilityId').value;
+      const fac = facilities.find(f => f.id === facId);
+      if (!fac) return;
+
+      // 3-hour session multiplier
+      const est = fac.ratePerHour * 3;
+      document.getElementById('bookFacilityEstimatedCost').textContent = `RM ${est}.00`;
+    }
+
+    function handleFacilityBooking(e) {
+      e.preventDefault();
+      const facId = document.getElementById('bookFacilityId').value;
+      const fac = facilities.find(f => f.id === facId);
+      const date = document.getElementById('bookFacilityDate').value;
+      const slot = document.getElementById('bookFacilitySlot').value;
+      const resident = document.getElementById('bookFacilityResident').value.trim();
+      const phone = document.getElementById('bookFacilityPhone').value.trim();
+      const address = document.getElementById('bookFacilityAddress').value.trim();
+      const purpose = document.getElementById('bookFacilityPurpose').value.trim() || 'General Usage';
+
+      const slotLabels = {
+        morning: 'Morning (09:00 AM - 12:00 PM)',
+        afternoon: 'Afternoon (02:00 PM - 05:00 PM)',
+        evening: 'Evening / Night (06:00 PM - 10:00 PM)'
+      };
+
+      const bookingRef = 'FAC-' + Math.floor(100000 + Math.random() * 900000);
+      facilityBookings.unshift({
+        ref: bookingRef,
+        facilityName: fac ? fac.name : 'Facility',
+        date,
+        slotName: slotLabels[slot] || slot,
+        resident,
+        phone,
+        address,
+        purpose,
+        status: 'Confirmed'
+      });
+
+      saveAllState();
+      closeModal('modalBookFacility');
+      document.getElementById('formBookFacility').reset();
+      showToast(`Booking ${bookingRef} Confirmed! Security guardhouse has been notified.`);
+    }
+
+    function viewMyBookings() {
+      const container = document.getElementById('myBookingsContainer');
+      if (facilityBookings.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <div class="w-10 h-10 mx-auto rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-lg mb-2">📅</div>
+            <p class="font-bold text-slate-700">No active bookings</p>
+            <p class="text-slate-400 text-xs">Reserve a badminton court, community hall, or BBQ pit anytime.</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = facilityBookings.map(b => `
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-900">${escapeHTML(b.facilityName)}</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                ${b.status}
+              </span>
+            </div>
+            <p class="text-slate-600">${b.date} • ${b.slotName}</p>
+            <div class="flex items-center justify-between text-slate-400 pt-1 text-[11px]">
+              <span>Ref: <strong>${b.ref}</strong></span>
+              <span>${escapeHTML(b.address)}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+      openModal('modalMyBookings');
+    }
+
+    // ==========================================
+    // RENDER: COMMUNITY EVENTS & RSVP
+    // ==========================================
+    function renderEvents() {
+      const container = document.getElementById('eventsContainer');
+      container.innerHTML = events.map(ev => {
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  ${escapeHTML(ev.badge)}
+                </span>
+                <span class="text-xs font-bold text-slate-500">
+                  <i class="fa-solid fa-users text-emerald-600 mr-1"></i> ${ev.attendees} Attending
+                </span>
+              </div>
+
+              <h3 class="font-bold text-slate-900 text-base leading-snug mb-2">${escapeHTML(ev.title)}</h3>
+
+              <div class="space-y-1.5 text-xs text-slate-600 mb-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <div class="flex items-center gap-2">
+                  <i class="fa-regular fa-calendar text-emerald-600 text-xs w-4"></i>
+                  <span class="font-medium">${ev.dateDisplay}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fa-regular fa-clock text-emerald-600 text-xs w-4"></i>
+                  <span>${escapeHTML(ev.time)}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-location-dot text-emerald-600 text-xs w-4"></i>
+                  <span class="truncate">${escapeHTML(ev.venue)}</span>
+                </div>
+                <div class="flex items-center gap-2 text-slate-500 text-[11px] pt-1 border-t border-slate-200">
+                  <span>Organized by: <strong>${escapeHTML(ev.organizer)}</strong></span>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-500 leading-relaxed mb-4">${escapeHTML(ev.desc)}</p>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="toggleEventRSVP('${ev.id}')" 
+                class="w-full py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                  ev.userRSVP 
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                    : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs'
+                }">
+                <i class="fa-solid ${ev.userRSVP ? 'fa-circle-check' : 'fa-calendar-check'}"></i>
+                <span>${ev.userRSVP ? 'Attending ✓' : 'RSVP / Register'}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleEventRSVP(id) {
+      const ev = events.find(e => e.id === id);
+      if (!ev) return;
+
+      if (ev.userRSVP) {
+        ev.userRSVP = false;
+        ev.attendees -= 1;
+        showToast(`Cancelled RSVP for "${ev.title}".`);
+      } else {
+        ev.userRSVP = true;
+        ev.attendees += 1;
+        showToast(`Registered! You're attending "${ev.title}".`);
+      }
+
+      saveAllState();
+      renderEvents();
+    }
+
+    function handleProposeEvent(e) {
+      e.preventDefault();
+      const title = document.getElementById('newEventTitle').value.trim();
+      const date = document.getElementById('newEventDate').value;
+      const time = document.getElementById('newEventTime').value.trim();
+      const venue = document.getElementById('newEventVenue').value.trim();
+      const organizer = document.getElementById('newEventOrganizer').value.trim() || 'Resident Committee';
+      const desc = document.getElementById('newEventDesc').value.trim();
+
+      const d = new Date(date);
+      const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+      const dateDisplay = d.toLocaleDateString('en-GB', options);
+
+      events.unshift({
+        id: 'ev-' + Date.now(),
+        title,
+        date,
+        dateDisplay,
+        time,
+        venue,
+        organizer,
+        desc,
+        badge: 'Community Activity',
+        attendees: 1,
+        userRSVP: true
+      });
+
+      saveAllState();
+      renderEvents();
+      closeModal('modalProposeEvent');
+      document.getElementById('formProposeEvent').reset();
+      showToast('New community event published to calendar!');
+    }
+
+    // ==========================================
+    // RENDER: ISSUES (Public Infra & Facilities)
+    // ==========================================
+    function syncCategoryOptions() {
+      const scope = document.getElementById('newIssueScope').value;
+      const catSelect = document.getElementById('newIssueCategory');
+
+      if (scope === 'Public Infrastructure') {
+        catSelect.innerHTML = `
+          <option value="Pothole & Roads">🕳️ Pothole & Roads</option>
+          <option value="Streetlights">💡 Streetlights</option>
+          <option value="Clogged Drain (Longkang)">🌊 Clogged Drain (Longkang)</option>
+          <option value="Fallen Tree & Landscaping">🌳 Fallen Tree & Branches</option>
+          <option value="Security Gatehouse Barrier">🚧 Guardhouse Barrier</option>
+        `;
+      } else {
+        catSelect.innerHTML = `
+          <option value="Community Hall Defect">🏛️ Dewan Aircond / Lights</option>
+          <option value="Sports Court Defect">🏸 Badminton Court / Net</option>
+          <option value="BBQ Pavilion Tap / Grill">🥩 BBQ Pavilion / Tap Water</option>
+          <option value="Power Bank Kiosk Slot Error">⚡ Power Bank Kiosk Error</option>
+          <option value="Playground Equipment">🛝 Playground Equipment</option>
+        `;
+      }
+    }
+
+    function renderIssues() {
+      const list = document.getElementById('issuesList');
+      const empty = document.getElementById('issuesEmpty');
+      const query = (document.getElementById('issueSearchInput')?.value || '').toLowerCase().trim();
+      const scopeFilter = document.getElementById('issueScopeFilter')?.value || 'All';
+      const statusFilter = document.getElementById('issueStatusFilter')?.value || 'All';
+
+      const filtered = issues.filter(item => {
+        const matchesQuery = !query || 
+          item.title.toLowerCase().includes(query) || 
+          item.location.toLowerCase().includes(query) || 
+          item.desc.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query);
+        const matchesScope = (scopeFilter === 'All' || item.scope === scopeFilter);
+        const matchesStatus = (statusFilter === 'All' || item.status === statusFilter);
+        return matchesQuery && matchesScope && matchesStatus;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      list.innerHTML = filtered.map(item => {
+        let statusBadge = 'bg-amber-100 text-amber-800 border-amber-200';
+        let statusTooltip = 'Report received, awaiting review or contractor dispatch';
+
+        if (item.status === 'In Progress') {
+          statusBadge = 'bg-blue-100 text-blue-800 border-blue-200';
+          statusTooltip = 'Contractor or maintenance team is actively rectifying this defect';
+        } else if (item.status === 'Resolved') {
+          statusBadge = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+          statusTooltip = 'Issue verified and completed';
+        }
+
+        const isUrgent = item.priority === 'Urgent';
+        const isFacility = item.scope === 'Township Facility';
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start justify-between gap-4 hover:border-slate-300 transition">
+            
+            <!-- Upvote Button -->
+            <button onclick="toggleIssueUpvote('${item.id}')" 
+              class="flex sm:flex-col items-center justify-center gap-1 px-3 py-2 sm:w-14 rounded-xl border text-xs transition shrink-0 ${
+                item.hasUpvoted 
+                  ? 'bg-rose-50 border-rose-300 text-rose-700 font-extrabold shadow-xs' 
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 font-bold'
+              }">
+              <i class="fa-solid fa-arrow-up text-xs"></i>
+              <span class="text-xs">${item.upvotes}</span>
+              <span class="text-[10px] hidden sm:block ${item.hasUpvoted ? 'text-rose-600' : 'text-slate-400'}">Me Too</span>
+            </button>
+
+            <!-- Main Content -->
+            <div class="flex-1 space-y-1.5 w-full">
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                  isFacility ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-700'
+                }">
+                  ${isFacility ? '🏛️ Facility' : '🛣️ Public Road'}
+                </span>
+
+                <span class="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-md">
+                  ${escapeHTML(item.category)}
+                </span>
+
+                ${isUrgent ? `
+                  <span class="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                    ⚠️ Urgent Hazard
+                  </span>
+                ` : ''}
+
+                <span class="text-[11px] text-slate-400">Lodged on ${item.date}</span>
+              </div>
+
+              <h3 class="font-bold text-slate-900 text-sm sm:text-base">${escapeHTML(item.title)}</h3>
+              
+              <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                <i class="fa-solid fa-location-dot text-rose-600 text-[11px]"></i>
+                <span>${escapeHTML(item.location)}</span>
+              </div>
+
+              <p class="text-xs text-slate-500 pt-0.5 leading-relaxed">${escapeHTML(item.desc)}</p>
+            </div>
+
+            <!-- Status & Management Selector -->
+            <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+              <span class="text-xs font-bold px-3 py-1 rounded-lg border ${statusBadge}" title="${statusTooltip}">
+                ● ${item.status}
+              </span>
+
+              <div class="flex items-center gap-1.5 text-xs">
+                <span class="text-[11px] text-slate-400">Status:</span>
+                <select onchange="updateIssueStatus('${item.id}', this.value)" 
+                  class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg px-2 py-1 font-semibold focus:outline-none focus:border-emerald-600">
+                  <option value="Reported" ${item.status === 'Reported' ? 'selected' : ''}>Reported</option>
+                  <option value="In Progress" ${item.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                  <option value="Resolved" ${item.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
     function toggleIssueUpvote(id) {
       const item = issues.find(i => i.id === id);
       if (!item) return;
@@ -851,22 +1967,174 @@
         item.upvotes += 1;
         item.hasUpvoted = true;
       }
-      saveState();
+      saveAllState();
       renderIssues();
     }
 
-    // Update Issue status
     function updateIssueStatus(id, newStatus) {
       const item = issues.find(i => i.id === id);
       if (item) {
         item.status = newStatus;
-        saveState();
+        saveAllState();
         renderIssues();
         showToast(`Issue status updated to ${newStatus}.`);
       }
     }
 
-    // Modal Helpers
+    function handleNewIssue(e) {
+      e.preventDefault();
+      const title = document.getElementById('newIssueTitle').value.trim();
+      const scope = document.getElementById('newIssueScope').value;
+      const category = document.getElementById('newIssueCategory').value;
+      const priority = document.getElementById('newIssuePriority').value;
+      const location = document.getElementById('newIssueLocation').value.trim();
+      const desc = document.getElementById('newIssueDesc').value.trim();
+
+      issues.unshift({
+        id: 'iss-' + Date.now(),
+        title,
+        scope,
+        category,
+        priority,
+        location,
+        desc,
+        date: getTodayFormatted(),
+        upvotes: 1,
+        hasUpvoted: true,
+        status: 'Reported'
+      });
+
+      saveAllState();
+      renderIssues();
+      closeModal('modalAddIssue');
+      document.getElementById('formAddIssue').reset();
+      showToast('Issue lodged in official township registry!');
+    }
+
+    // ==========================================
+    // RENDER: MANAGEMENT FEE BILLING & PAYMENT
+    // ==========================================
+    function renderBillingSection() {
+      const badge = document.getElementById('currentBillStatusBadge');
+      const btn = document.getElementById('btnPayNow');
+      const amtDisplay = document.getElementById('billAmountDisplay');
+
+      if (currentBillPaid) {
+        badge.className = 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200';
+        badge.textContent = '✅ Fully Settled';
+        amtDisplay.textContent = 'RM 0.00';
+        btn.disabled = true;
+        btn.className = 'flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-slate-200 text-slate-500 font-bold text-xs sm:text-sm cursor-not-allowed';
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>October 2026 Settled</span>';
+      } else {
+        badge.className = 'text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200';
+        badge.textContent = '● Pending Payment';
+        amtDisplay.textContent = 'RM 120.00';
+        btn.disabled = false;
+        btn.className = 'flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-xs transition active:scale-95 flex items-center justify-center gap-2';
+        btn.innerHTML = '<i class="fa-solid fa-lock text-xs"></i> <span>Pay Fee (RM 120.00)</span>';
+      }
+
+      renderPaymentHistory();
+    }
+
+    function renderPaymentHistory() {
+      const tbody = document.getElementById('paymentHistoryBody');
+      tbody.innerHTML = payments.map(p => `
+        <tr class="hover:bg-slate-50/70 transition">
+          <td class="py-3 px-3 font-mono font-semibold text-slate-800">${p.receiptNo}</td>
+          <td class="py-3 px-3 font-semibold text-slate-900">${p.period}</td>
+          <td class="py-3 px-3 font-bold text-emerald-700">${p.amount}</td>
+          <td class="py-3 px-3 text-slate-600">${p.method}</td>
+          <td class="py-3 px-3 text-slate-500">${p.date}</td>
+          <td class="py-3 px-3">
+            <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[10px]">
+              ${p.status}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-right">
+            <button onclick="viewPastReceipt('${p.receiptNo}', '${p.amount}', '${p.method}', '${p.date}')" 
+              class="text-emerald-700 hover:text-emerald-900 font-bold text-[11px] underline">
+              View Receipt
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openPaymentGateway() {
+      openModal('modalPaymentGateway');
+    }
+
+    function selectPayMethod(method) {
+      activePayMethod = method;
+      const btnDuitNow = document.getElementById('payMethodDuitNow');
+      const btnFPX = document.getElementById('payMethodFPX');
+      const viewDuitNow = document.getElementById('channelDuitNowView');
+      const viewFPX = document.getElementById('channelFPXView');
+
+      if (method === 'duitnow') {
+        btnDuitNow.className = 'py-2.5 px-3 rounded-xl border-2 border-emerald-700 bg-emerald-50/50 text-emerald-800 font-bold flex flex-col items-center justify-center gap-1 transition';
+        btnFPX.className = 'py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold flex flex-col items-center justify-center gap-1 transition hover:bg-slate-50';
+        viewDuitNow.classList.remove('hidden');
+        viewFPX.classList.add('hidden');
+      } else {
+        btnFPX.className = 'py-2.5 px-3 rounded-xl border-2 border-emerald-700 bg-emerald-50/50 text-emerald-800 font-bold flex flex-col items-center justify-center gap-1 transition';
+        btnDuitNow.className = 'py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold flex flex-col items-center justify-center gap-1 transition hover:bg-slate-50';
+        viewFPX.classList.remove('hidden');
+        viewDuitNow.classList.add('hidden');
+      }
+    }
+
+    function processSimulatedPayment() {
+      const ref = 'REC-MY-2026-' + Math.floor(1000 + Math.random() * 9000);
+      const methodLabel = activePayMethod === 'duitnow' 
+        ? 'DuitNow QR' 
+        : `FPX (${document.getElementById('fpxBankSelect').value})`;
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + 
+        ', ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Record in payment history
+      payments.unshift({
+        receiptNo: ref,
+        period: 'October 2026',
+        amount: 'RM 120.00',
+        method: methodLabel,
+        date: dateStr,
+        status: 'Paid'
+      });
+
+      currentBillPaid = true;
+      saveAllState();
+
+      closeModal('modalPaymentGateway');
+      renderBillingSection();
+
+      // Show instant generated receipt
+      document.getElementById('recRefNumber').textContent = ref;
+      document.getElementById('recDateTime').textContent = dateStr;
+      document.getElementById('recAddress').textContent = currentUnit;
+      document.getElementById('recMethod').textContent = methodLabel;
+      document.getElementById('recAmount').textContent = 'RM 120.00';
+      openModal('modalReceipt');
+
+      showToast('Maintenance fee settled successfully! e-Receipt generated.');
+    }
+
+    function viewPastReceipt(ref, amt, method, date) {
+      document.getElementById('recRefNumber').textContent = ref;
+      document.getElementById('recDateTime').textContent = date;
+      document.getElementById('recAddress').textContent = currentUnit;
+      document.getElementById('recMethod').textContent = method;
+      document.getElementById('recAmount').textContent = amt;
+      openModal('modalReceipt');
+    }
+
+    // ==========================================
+    // HELPERS & MODAL UTILS
+    // ==========================================
     function openModal(id) {
       document.getElementById(id).classList.remove('hidden');
     }
@@ -874,7 +2142,6 @@
       document.getElementById(id).classList.add('hidden');
     }
 
-    // Toast alert
     function showToast(msg, isError = false) {
       const toast = document.getElementById('toast');
       const text = document.getElementById('toastMsg');
@@ -890,10 +2157,18 @@
       toast.classList.remove('translate-y-24', 'opacity-0');
       setTimeout(() => {
         toast.classList.add('translate-y-24', 'opacity-0');
-      }, 2400);
+      }, 2600);
     }
 
-    // Sanitization
+    function getTodayFormatted() {
+      const today = new Date();
+      return today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function capitalize(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
     function escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -904,10 +2179,18 @@
         .replace(/'/g, '&#039;');
     }
 
+    // ==========================================
+    // INITIAL BOOTSTRAP
+    // ==========================================
     window.onload = function() {
-      updateBadgeCounts();
+      updateHeaderBadges();
+      syncCategoryOptions();
+      renderKiosks();
       renderEquipment();
+      renderFacilities();
+      renderEvents();
       renderIssues();
+      renderBillingSection();
     };
   </script>
 </body>
